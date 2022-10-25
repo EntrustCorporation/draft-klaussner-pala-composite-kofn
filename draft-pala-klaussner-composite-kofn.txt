@@ -1,0 +1,504 @@
+
+
+
+
+LAMPS                                                            M. Pala
+Internet-Draft                                                 CableLabs
+Intended status: Standards Track                            J. Klaussner
+Expires: 27 April 2023                                      D-Trust GmbH
+                                                         24 October 2022
+
+
+         K-threshold Composite Signatures for the Internet PKI
+                 draft-pala-klaussner-composite-kofn-00
+
+Abstract
+
+   With the need to evolve the cryptography used in today applications,
+   devices, and networks, there might be many scenarios where the use of
+   a single-key certificate is not sufficient.  For example, there might
+   be the need for migrating between two existing algorithms (e.g., from
+   classic to post-quantum) or there might be the need to test the
+   capabilities of devices via test drivers and/or non-standard
+   algorithms.
+
+   Differently from the situation where algorithms are not yet (or no
+   more) trusted to be used by themselves, this document addresses the
+   use of multiple keys and signatures that can be individually trusted
+   to implement a generic 1-threshold and K-threshold signature
+   validation procedures.
+
+   This document relies on the definition of CompositePublicKey,
+   CompositePrivateKey, and CompositeSignature which are sequences of
+   the respective structure for each component algorithm as defined in
+   I-D.ounsworth-pq-composite-keys and I-D.ounsworth-pq-composite-sigs
+   respectively.
+
+Status of This Memo
+
+   This Internet-Draft is submitted in full conformance with the
+   provisions of BCP 78 and BCP 79.
+
+   Internet-Drafts are working documents of the Internet Engineering
+   Task Force (IETF).  Note that other groups may also distribute
+   working documents as Internet-Drafts.  The list of current Internet-
+   Drafts is at https://datatracker.ietf.org/drafts/current/.
+
+   Internet-Drafts are draft documents valid for a maximum of six months
+   and may be updated, replaced, or obsoleted by other documents at any
+   time.  It is inappropriate to use Internet-Drafts as reference
+   material or to cite them other than as "work in progress."
+
+   This Internet-Draft will expire on 27 April 2023.
+
+
+
+Pala & Klaussner          Expires 27 April 2023                 [Page 1]
+
+Internet-Draft              K-threshold Sigs                October 2022
+
+
+Copyright Notice
+
+   Copyright (c) 2022 IETF Trust and the persons identified as the
+   document authors.  All rights reserved.
+
+   This document is subject to BCP 78 and the IETF Trust's Legal
+   Provisions Relating to IETF Documents (https://trustee.ietf.org/
+   license-info) in effect on the date of publication of this document.
+   Please review these documents carefully, as they describe your rights
+   and restrictions with respect to this document.  Code Components
+   extracted from this document must include Revised BSD License text as
+   described in Section 4.e of the Trust Legal Provisions and are
+   provided without warranty as described in the Revised BSD License.
+
+Table of Contents
+
+   1.  Terminology . . . . . . . . . . . . . . . . . . . . . . . . .   2
+   2.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   3
+   3.  Composite Crypto Keys . . . . . . . . . . . . . . . . . . . .   3
+   4.  The Composite Crypto Plus model . . . . . . . . . . . . . . .   4
+     4.1.  1-threshold (1 of N) and K-threshold (K of N)
+           signatures  . . . . . . . . . . . . . . . . . . . . . . .   4
+     4.2.  Signature Generation  . . . . . . . . . . . . . . . . . .   5
+     4.3.  Signature Validation  . . . . . . . . . . . . . . . . . .   5
+   5.  Algorithm Identifiers . . . . . . . . . . . . . . . . . . . .   5
+   6.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   6
+   7.  Security Considerations . . . . . . . . . . . . . . . . . . .   6
+   8.  References  . . . . . . . . . . . . . . . . . . . . . . . . .   6
+     8.1.  Normative References  . . . . . . . . . . . . . . . . . .   6
+     8.2.  Informative References  . . . . . . . . . . . . . . . . .   7
+   Appendix A.  ASN.1 Module . . . . . . . . . . . . . . . . . . . .   7
+   Appendix B.  Intellectual Property Considerations . . . . . . . .   8
+   Appendix C.  Contributors and Acknowledgements  . . . . . . . . .   9
+     C.1.  Making contributions  . . . . . . . . . . . . . . . . . .   9
+   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .   9
+
+1.  Terminology
+
+   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+   "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
+   "OPTIONAL" in this document are to be interpreted as described in BCP
+   14 [RFC2119] [RFC8174] when, and only when, they appear in all
+   capitals, as shown here.
+
+   This document is consistent with all terminology from
+   [I-D.driscoll-pqt-hybrid-terminology].
+
+   In addition, the following terms are used in this document:
+
+
+
+Pala & Klaussner          Expires 27 April 2023                 [Page 2]
+
+Internet-Draft              K-threshold Sigs                October 2022
+
+
+   BER: Basic Encoding Rules (BER) as defined in [X.690].
+
+   CLIENT: Any software that is making use of a cryptographic key.  This
+   includes a signer, verifier, encrypter, decrypter.
+
+   DER: Distinguished Encoding Rules as defined in [X.690].
+
+   PKI: Public Key Infrastructure, as defined in [RFC5280].
+
+   PUBLIC / PRIVATE KEY: The public and private portion of an asymmetric
+   cryptographic key, making no assumptions about which algorithm.
+
+   COMPONENT KEY: One component of the Composite Key. For example, an
+   RSA, a Dilithium3 or a Falcon512 key.
+
+2.  Introduction
+
+   When the trust in the cryptographic algorithms is not static (e.g.,
+   not enough crypto-analysis has happened yet or a new threat is
+   envisioned to be deployable in the next future), there might be the
+   need to combine multiple algorithms together to address the crypto-
+   uncertainty of the envisioned period.
+
+   An example of such a situation can be found in the planning for the
+   transition to post-quantum cryptography (PQ or PQC).  While classic
+   algorithms will still be trusted for some time (but we do not know
+   how much), there is uncertainty as to the strength of the new
+   cryptographic algorithms.  Unlike previous cryptographic algorithm
+   migrations, the choice of when to migrate and which algorithms to
+   migrate to, is not so clear.
+
+   Even after the migration period, it may be advantageous for an entity
+   cryptographic identity to be composed of multiple public-key
+   algorithms by using a Post-Quantum/Traditional (PQ/T) or Post-
+   Quantum/Post-Quantum (PQ/PQ) Hybrid scheme.
+
+   For further considerations on the challenges related to crypto-
+   agility, please refer to [I-D.ounsworth-pq-composite-keys].
+
+   This document is intended for general applicability anywhere that
+   keys are used within PKIX or CMS structures.
+
+3.  Composite Crypto Keys
+
+   In this document import the definition of Composite Keys as defined
+   in [I-D.ounsworth-pq-composite-keys].
+
+
+
+
+
+Pala & Klaussner          Expires 27 April 2023                 [Page 3]
+
+Internet-Draft              K-threshold Sigs                October 2022
+
+
+   In this document we also import the definition of Composite
+   Signatures as defined in [I-D.ounsworth-pq-composite-sigs] and define
+   the following signature structure:
+
+   CompositeSignaturePlusValue ::= SEQUENCE {
+       signatureSequence           CompositeSignatureValue
+       requiredValidSignatures     INTEGER (1..MAX) OPTIONAL
+   }
+
+   The signatureSequence field is the value of the composite signature
+   as defined in [I-D.ounsworth-pq-composite-sigs] while the
+   requiredValidSignature optional field is used to indicate the number
+   of positive signatures required to consider the composite signature
+   value.
+
+   The signatureSequence field carries the Composite signature value
+   (sequence of signatures) and an optional requiredValidSignatures
+   field.
+
+   The signer entity MAY use the requiredValidSignatures value to
+   indicate to the verifier to perform signature validations using only
+   a subset of the components in a Composite key instead of all the
+   components as required in normal Composite validation.
+
+   The value of the requiredValidSignatures field must be, if present,
+   greater or equal to one (1) and MUST NOT be larger than the number of
+   components keys used to generate the Composite signature.
+
+4.  The Composite Crypto Plus model
+
+   The Composite Crypto Plus signature model provides the possibility to
+   modify the expected behavior of the signature validation process by
+   allowing the signer to specify under which conditions the use of one
+   (1) or more successful validation is to be considered sufficient for
+   the Composite signature to be considered valid.
+
+4.1.  1-threshold (1 of N) and K-threshold (K of N) signatures
+
+   In order to implement the 1-threshold (1 of N) or K-threshold (K of
+   N) validation policies, Composite signatures (sequence of signatures)
+   are augmented with the requiredValidSignatures optional field.
+
+   The signer MAY use the value of one (1) to indicate to the verifier
+   that at least one (1) successful signature validation operations is
+   required.  More validations MAY be performed, but they are not
+   required.
+
+
+
+
+
+Pala & Klaussner          Expires 27 April 2023                 [Page 4]
+
+Internet-Draft              K-threshold Sigs                October 2022
+
+
+   The signer MAY use a value greater than one (1), such as two (2) or
+   larger, to indicate to the verifier that at least two (2) or more
+   successful signature validations are required to consider the
+   signature valid.
+
+4.2.  Signature Generation
+
+   When generating CompositePlus signatures, the signer follows the same
+   procedures as described in I-D.draft-ounsworth-pq-composite-sigs-05.
+
+4.3.  Signature Validation
+
+   When validating CompositePlus signatures, the verifier follows the
+   same procedures as described in Section 5.2 of I-D.draft-ounsworth-
+   pq-composite-sigs-05 with the following modifications.
+
+   If the optional requiredValidSignatures field is present in the
+   signature, the verifier can modify the validation process as follows:
+
+  Signature Verification Procedure::
+     1. Check keys, signatures, and algorithms lists for consistency.
+
+        If Error during Desequencing, or the three sequences have
+        different numbers of elements, or any of the public keys
+        P1, P2, .., Pn or algorithm identifiers A1, A2, .., An are
+        composite with the OID id-alg-composite or an explicit composite
+        OID then output "Invalid signature" and stop.
+
+     2. Check each component signature individually, according to its
+         algorithm specification.
+         If any fail, then the entire signature validation fails.
+
+       k := <validations-threshold>
+       for i := 1 to n
+            if not verify( Pi, M, Si, Ai ), then
+              output "Invalid signature"
+            if i >= k, then
+              output "Valid Signature"
+
+        if all succeeded, then
+          output "Valid signature"
+
+5.  Algorithm Identifiers
+
+   This document does not define a separate sets of algorithms for
+   Composite Keys and Composite Signatures.
+
+
+
+
+
+Pala & Klaussner          Expires 27 April 2023                 [Page 5]
+
+Internet-Draft              K-threshold Sigs                October 2022
+
+
+   Both the generic composite OID and the specific combinations OIDs can
+   be used together with the additional optional field.
+
+6.  IANA Considerations
+
+   No IANA considerations.
+
+7.  Security Considerations
+
+8.  References
+
+8.1.  Normative References
+
+   [I-D.ounsworth-pq-composite-keys]
+              Ounsworth, M., Pala, M., and J. Klaußner, "Composite
+              Public and Private Keys For Use In Internet PKI", Work in
+              Progress, Internet-Draft, draft-ounsworth-pq-composite-
+              keys-03, 22 October 2022,
+              <https://www.ietf.org/archive/id/draft-ounsworth-pq-
+              composite-keys-03.txt>.
+
+   [I-D.ounsworth-pq-composite-sigs]
+              Ounsworth, M. and M. Pala, "Composite Signatures For Use
+              In Internet PKI", Work in Progress, Internet-Draft, draft-
+              ounsworth-pq-composite-sigs-05, 12 July 2021,
+              <https://www.ietf.org/archive/id/draft-ounsworth-pq-
+              composite-sigs-05.txt>.
+
+   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+              Requirement Levels", BCP 14, RFC 2119,
+              DOI 10.17487/RFC2119, March 1997,
+              <https://www.rfc-editor.org/info/rfc2119>.
+
+   [RFC5280]  Cooper, D., Santesson, S., Farrell, S., Boeyen, S.,
+              Housley, R., and W. Polk, "Internet X.509 Public Key
+              Infrastructure Certificate and Certificate Revocation List
+              (CRL) Profile", RFC 5280, DOI 10.17487/RFC5280, May 2008,
+              <https://www.rfc-editor.org/info/rfc5280>.
+
+   [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
+              2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
+              May 2017, <https://www.rfc-editor.org/info/rfc8174>.
+
+   [RFC8411]  Schaad, J. and R. Andrews, "IANA Registration for the
+              Cryptographic Algorithm Object Identifier Range",
+              RFC 8411, DOI 10.17487/RFC8411, August 2018,
+              <https://www.rfc-editor.org/info/rfc8411>.
+
+
+
+
+Pala & Klaussner          Expires 27 April 2023                 [Page 6]
+
+Internet-Draft              K-threshold Sigs                October 2022
+
+
+   [X.690]    ITU-T, "Information technology - ASN.1 encoding Rules:
+              Specification of Basic Encoding Rules (BER), Canonical
+              Encoding Rules (CER) and Distinguished Encoding Rules
+              (DER)", ISO/IEC 8825-1:2015, November 2015.
+
+8.2.  Informative References
+
+   [I-D.driscoll-pqt-hybrid-terminology]
+              D, F., "Terminology for Post-Quantum Traditional Hybrid
+              Schemes", Work in Progress, Internet-Draft, draft-
+              driscoll-pqt-hybrid-terminology-01, 20 October 2022,
+              <https://www.ietf.org/archive/id/draft-driscoll-pqt-
+              hybrid-terminology-01.txt>.
+
+Appendix A.  ASN.1 Module
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Pala & Klaussner          Expires 27 April 2023                 [Page 7]
+
+Internet-Draft              K-threshold Sigs                October 2022
+
+
+   <CODE STARTS>
+
+   Composite-Sigs-Plus-2022
+
+   DEFINITIONS IMPLICIT TAGS ::= BEGIN
+
+   EXPORTS ALL;
+
+   IMPORTS
+     PUBLIC-KEY, SIGNATURE-ALGORITHM, ParamOptions, AlgorithmIdentifier{}
+       FROM AlgorithmInformation-2009  -- RFC 5912 [X509ASN1]
+         { iso(1) identified-organization(3) dod(6) internet(1)
+           security(5) mechanisms(5) pkix(7) id-mod(0)
+           id-mod-algorithmInformation-02(58) }
+
+     SubjectPublicKeyInfo
+       FROM PKIX1Explicit-2009
+         { iso(1) identified-organization(3) dod(6) internet(1)
+           security(5) mechanisms(5) pkix(7) id-mod(0)
+           id-mod-pkix1-explicit-02(51) }
+
+     OneAsymmetricKey
+       FROM AsymmetricKeyPackageModuleV1
+         { iso(1) member-body(2) us(840) rsadsi(113549) pkcs(1)
+           pkcs-9(9) smime(16) modules(0)
+           id-mod-asymmetricKeyPkgV1(50) } ;
+
+     COMPOSITE-KEY-ALGORITHM, pk-Composite, CompositePublicKey, CompositePrivateKey, pk-explicitComposite, id-composite-key
+       FROM Composite-Keys-2022 -- {{I-D.draft-ounsworth-pq-sigs}}
+         { ... }
+   --
+   -- Object Identifiers
+   --
+
+
+   --
+   -- Public Key
+   --
+
+   END
+
+   <CODE ENDS>
+
+Appendix B.  Intellectual Property Considerations
+
+   The following IPR Disclosure relates to this draft:
+
+   https://datatracker.ietf.org/ipr/3588/
+
+
+
+Pala & Klaussner          Expires 27 April 2023                 [Page 8]
+
+Internet-Draft              K-threshold Sigs                October 2022
+
+
+Appendix C.  Contributors and Acknowledgements
+
+   This document incorporates contributions and comments from a large
+   group of experts.  The Editors would especially like to acknowledge
+   the expertise and tireless dedication of the following people, who
+   attended many long meetings and generated millions of bytes of
+   electronic mail and VOIP traffic over the past year in pursuit of
+   this document:
+
+   John Gray (Entrust), Serge Mister (Entrust), Scott Fluhrer (Cisco
+   Systems), Panos Kampanakis (Cisco Systems), Daniel Van Geest (ISARA),
+   Tim Hollebeek (Digicert), Klaus-Dieter Wirth (D-Trust), and Francois
+   Rousseau.
+
+   We are grateful to all, including any contributors who may have been
+   inadvertently omitted from this list.
+
+   This document borrows text from similar documents, including those
+   referenced below.  Thanks go to the authors of those documents.
+   "Copying always makes things easier and less error prone" -
+   [RFC8411].
+
+C.1.  Making contributions
+
+   Additional contributions to this draft are welcome.  Please see the
+   working copy of this draft at, as well as open issues at:
+
+   https://github.com/EntrustCorporation/draft-ounsworth-pq-composite-
+   keys
+
+Authors' Addresses
+
+   Massimiliano Pala
+   CableLabs Inc.
+   858 Coal Creek Cir
+   Louisville, Colorado,  80027
+   United States of America
+
+   Email: director@openca.org
+
+
+   Jan Klaussner
+   D-Trust GmbH
+   Kommandantenstr. 15
+   10969 Berlin
+   Germany
+
+   Email: jan.klaussner@d-trust.net
+
+
+
+Pala & Klaussner          Expires 27 April 2023                 [Page 9]
