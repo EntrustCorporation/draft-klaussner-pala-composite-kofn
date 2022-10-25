@@ -73,8 +73,8 @@ keys and signatures that can be individually trusted to implement a generic
 
 This document relies on the definition of CompositePublicKey, CompositePrivateKey,
 and CompositeSignature which are sequences of the respective structure for each
-component algorithm as defined in I-D.ounsworth-pq-composite-keys and
-I-D.ounsworth-pq-composite-sigs respectively.
+component algorithm as defined in {{I-D.ounsworth-pq-composite-keys}} and
+{{I-D.ounsworth-pq-composite-sigs}} respectively.
 
 <!-- End of Abstract -->
 
@@ -143,7 +143,7 @@ within PKIX or CMS structures.
 
 <!-- End of Introduction section -->
 
-# Composite Crypto Keys {#composite-data-structures}
+# Composite Crypto Signature Plus {#composite-data-structures}
 
 In this document import the definition of Composite Keys as defined in {{I-D.ounsworth-pq-composite-keys}}.
 
@@ -198,12 +198,12 @@ are required to consider the signature valid.
 ## Signature Generation
 
 When generating CompositePlus signatures, the signer follows the same procedures as
-described in I-D.draft-ounsworth-pq-composite-sigs-05.
+described in {{I-D.ounsworth-pq-composite-sigs}}.
 
 ## Signature Validation
 
 When validating CompositePlus signatures, the verifier follows the same procedures
-as described in Section 5.2 of I-D.draft-ounsworth-pq-composite-sigs-05 with the
+as described in Section 5.2 of {{I-D.ounsworth-pq-composite-sigs}} with the
 following modifications.
 
 If the optional requiredValidSignatures field is present in the signature, the

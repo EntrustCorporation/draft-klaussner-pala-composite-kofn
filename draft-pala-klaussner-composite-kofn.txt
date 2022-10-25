@@ -31,8 +31,8 @@ Abstract
    This document relies on the definition of CompositePublicKey,
    CompositePrivateKey, and CompositeSignature which are sequences of
    the respective structure for each component algorithm as defined in
-   I-D.ounsworth-pq-composite-keys and I-D.ounsworth-pq-composite-sigs
-   respectively.
+   [I-D.ounsworth-pq-composite-keys] and
+   [I-D.ounsworth-pq-composite-sigs] respectively.
 
 Status of This Memo
 
@@ -76,7 +76,7 @@ Table of Contents
 
    1.  Terminology . . . . . . . . . . . . . . . . . . . . . . . . .   2
    2.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   3
-   3.  Composite Crypto Keys . . . . . . . . . . . . . . . . . . . .   3
+   3.  Composite Crypto Signature Plus . . . . . . . . . . . . . . .   3
    4.  The Composite Crypto Plus model . . . . . . . . . . . . . . .   4
      4.1.  1-threshold (1 of N) and K-threshold (K of N)
            signatures  . . . . . . . . . . . . . . . . . . . . . . .   4
@@ -156,7 +156,7 @@ Internet-Draft              K-threshold Sigs                October 2022
    This document is intended for general applicability anywhere that
    keys are used within PKIX or CMS structures.
 
-3.  Composite Crypto Keys
+3.  Composite Crypto Signature Plus
 
    In this document import the definition of Composite Keys as defined
    in [I-D.ounsworth-pq-composite-keys].
@@ -234,13 +234,13 @@ Internet-Draft              K-threshold Sigs                October 2022
 4.2.  Signature Generation
 
    When generating CompositePlus signatures, the signer follows the same
-   procedures as described in I-D.draft-ounsworth-pq-composite-sigs-05.
+   procedures as described in [I-D.ounsworth-pq-composite-sigs].
 
 4.3.  Signature Validation
 
    When validating CompositePlus signatures, the verifier follows the
-   same procedures as described in Section 5.2 of I-D.draft-ounsworth-
-   pq-composite-sigs-05 with the following modifications.
+   same procedures as described in Section 5.2 of
+   [I-D.ounsworth-pq-composite-sigs] with the following modifications.
 
    If the optional requiredValidSignatures field is present in the
    signature, the verifier can modify the validation process as follows:
