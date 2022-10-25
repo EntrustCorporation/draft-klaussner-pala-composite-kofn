@@ -1,0 +1,342 @@
+---
+title: K-threshold Composite Signatures for the Internet PKI
+abbrev: K-threshold Sigs
+docname: draft-pala-klaussner-composite-kofn-00
+
+# <!-- stand_alone: true -->
+ipr: trust200902
+area: Security
+wg: LAMPS
+kw: Internet-Draft
+cat: std
+submissionType: IETF
+
+coding: us-ascii
+pi:    # can use array (if all yes) or hash here
+  toc: yes
+  sortrefs:   # defaults to yes
+  symrefs: yes
+
+author:
+    -
+      ins: M. Pala
+      name: Massimiliano Pala
+      org: CableLabs Inc.
+      abbrev: CableLabs
+      street: 858 Coal Creek Cir
+      city: Louisville, Colorado
+      country: United States of America
+      code: 80027
+      email: director@openca.org
+
+    -
+      ins: J. Klaussner
+      name: Jan Klaussner
+      org: D-Trust GmbH
+      email: jan.klaussner@d-trust.net
+      street: Kommandantenstr. 15
+      code: 10969
+      city: Berlin
+      country: Germany
+
+normative:
+  RFC2119:
+  RFC5280:
+  RFC8174:
+  RFC8411:
+  I-D.draft-ounsworth-pq-composite-sigs-05:
+  I-D.draft-ounsworth-pq-composite-keys-03:
+  X.690:
+      title: "Information technology - ASN.1 encoding Rules: Specification of Basic Encoding Rules (BER), Canonical Encoding Rules (CER) and Distinguished Encoding Rules (DER)"
+      date: November 2015
+      author:
+        org: ITU-T
+      seriesinfo:
+        ISO/IEC: 8825-1:2015
+
+informative:
+  I-D.draft-driscoll-pqt-hybrid-terminology-01:
+
+--- abstract
+
+With the need to evolve the cryptography used in today applications, 
+devices, and networks, there might be many scenarios where the use of a
+single-key certificate is not sufficient. For example, there might be the
+need for migrating between two existing algorithms (e.g., from classic
+to post-quantum) or there might be the need to test the capabilities of
+devices via test drivers and/or non-standard algorithms.
+
+Differently from the situation where algorithms are not yet (or no more)
+trusted to be used by themselves, this document addresses the use of multiple
+keys and signatures that can be individually trusted to implement a generic
+1-threshold and K-threshold signature validation procedures.
+
+This document relies on the definition of CompositePublicKey, CompositePrivateKey,
+and CompositeSignature which are sequences of the respective structure for each
+component algorithm as defined in I-D.ounsworth-pq-composite-keys and
+I-D.ounsworth-pq-composite-sigs respectively.
+
+<!-- End of Abstract -->
+
+--- middle
+
+# Terminology {#sec-terminology}
+The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD",
+"SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this
+document are to be interpreted as described in BCP 14 {{RFC2119}}  {{RFC8174}}
+when, and only when, they appear in all capitals, as shown here.
+
+This document is consistent with all terminology from {{I-D.driscoll-pqt-hybrid-terminology}}.
+
+In addition, the following terms are used in this document:
+
+
+BER:
+          Basic Encoding Rules (BER) as defined in [X.690].
+
+CLIENT:
+          Any software that is making use of a cryptographic key.
+          This includes a signer, verifier, encrypter, decrypter.
+      
+
+DER:
+          Distinguished Encoding Rules as defined in [X.690].
+
+
+PKI:
+          Public Key Infrastructure, as defined in [RFC5280].
+
+
+PUBLIC / PRIVATE KEY:
+          The public and private portion of an asymmetric cryptographic
+          key, making no assumptions about which algorithm.
+
+COMPONENT KEY:
+          One component of the Composite Key. For example, an RSA, a
+          Dilithium3 or a Falcon512 key.
+
+# Introduction {#sec-intro}
+
+When the trust in the cryptographic algorithms is not static (e.g., not
+enough crypto-analysis has happened yet or a new threat is envisioned to
+be deployable in the next future), there might be the need to combine multiple
+algorithms together to address the crypto-uncertainty of the envisioned
+period.         
+
+An example of such a situation can be found in the planning for the transition
+to post-quantum cryptography (PQ or PQC). While classic algorithms will still
+be trusted for some time (but we do not know how much), there is uncertainty as
+to the strength of the new cryptographic algorithms. Unlike previous cryptographic
+algorithm migrations, the choice of when to migrate and which algorithms to migrate
+to, is not so clear. 
+
+Even after the migration period, it may be advantageous for an entity
+cryptographic identity to be composed of multiple public-key algorithms by using
+a Post-Quantum/Traditional (PQ/T) or Post-Quantum/Post-Quantum (PQ/PQ) Hybrid
+scheme.
+
+For further considerations on the challenges related to crypto-agility, please refer
+to {{I-D.ounsworth-pq-composite-keys}}.
+
+This document is intended for general applicability anywhere that keys are used
+within PKIX or CMS structures.
+
+<!-- End of Introduction section -->
+
+# Composite Crypto Keys {#composite-data-structures}
+
+In this document import the definition of Composite Keys as defined in {{I-D.ounsworth-pq-composite-keys}}.
+
+In this document we also import the definition of Composite Signatures as defined in
+{{I-D.ounsworth-pq-composite-sigs}} and define the following signature structure:
+
+~~~ ASN1
+CompositeSignaturePlusValue ::= SEQUENCE {
+    signatureSequence           CompositeSignatureValue
+    requiredValidSignatures     INTEGER (1..MAX) OPTIONAL
+}
+~~~
+{: artwork-name="CompositeSignaturePlusValue-asn.1-structures"}
+
+The signatureSequence field is the value of the composite signature as defined in
+{{I-D.ounsworth-pq-composite-sigs}} while the requiredValidSignature optional field
+is used to indicate the number of positive signatures required to consider the
+composite signature value.
+
+The signatureSequence field carries the Composite signature value (sequence of
+signatures) and an optional requiredValidSignatures field.
+
+The signer entity MAY use the requiredValidSignatures value to indicate to the verifier
+to perform signature validations using only a subset of the components in a Composite
+key instead of all the components as required in normal Composite validation.
+
+The value of the requiredValidSignatures field must be, if present, greater or equal
+to one (1) and MUST NOT be larger than the number of components keys used to generate
+the Composite signature.
+
+# The Composite Crypto Plus model
+
+The Composite Crypto Plus signature model provides the possibility to modify the
+expected behavior of the signature validation process by allowing the signer to
+specify under which conditions the use of one (1) or more successful validation
+is to be considered sufficient for the Composite signature to be considered valid.
+
+## 1-threshold (1 of N) and K-threshold (K of N) signatures
+
+In order to implement the 1-threshold (1 of N) or K-threshold (K of N) validation
+policies, Composite signatures (sequence of signatures) are augmented with the
+requiredValidSignatures optional field.
+
+The signer MAY use the value of one (1) to indicate to the verifier that at least
+one (1) successful signature validation operations is required. More validations
+MAY be performed, but they are not required.
+
+The signer MAY use a value greater than one (1), such as two (2) or larger, to
+indicate to the verifier that at least two (2) or more successful signature validations
+are required to consider the signature valid.
+
+## Signature Generation
+
+When generating CompositePlus signatures, the signer follows the same procedures as
+described in I-D.draft-ounsworth-pq-composite-sigs-05.
+
+## Signature Validation
+
+When validating CompositePlus signatures, the verifier follows the same procedures
+as described in Section 5.2 of I-D.draft-ounsworth-pq-composite-sigs-05 with the
+following modifications.
+
+If the optional requiredValidSignatures field is present in the signature, the
+verifier can modify the validation process as follows:
+
+~~~
+Signature Verification Procedure::
+   1. Check keys, signatures, and algorithms lists for consistency.
+
+      If Error during Desequencing, or the three sequences have
+      different numbers of elements, or any of the public keys 
+      P1, P2, .., Pn or algorithm identifiers A1, A2, .., An are 
+      composite with the OID id-alg-composite or an explicit composite
+      OID then output "Invalid signature" and stop.
+
+   2. Check each component signature individually, according to its
+       algorithm specification.
+       If any fail, then the entire signature validation fails.
+
+     k := <validations-threshold>
+     for i := 1 to n
+          if not verify( Pi, M, Si, Ai ), then
+            output "Invalid signature"
+          if i >= k, then
+            output "Valid Signature"
+
+      if all succeeded, then
+        output "Valid signature"
+~~~
+{: artwork-name="alg-sig-verify-plus"}
+
+# Algorithm Identifiers {#sec-alg-ids}
+
+This document does not define a separate sets of algorithms for Composite Keys and
+Composite Signatures.
+
+Both the generic composite OID and the specific combinations OIDs can be used together
+with the additional optional field.
+
+# IANA Considerations {#sec-iana}
+
+No IANA considerations.
+
+# Security Considerations {#security-considerations}
+
+
+<!-- End of Security Considerations section -->
+
+<!-- Start of Appendices -->
+--- back
+
+
+# ASN.1 Module
+
+~~~ ASN.1
+
+<CODE STARTS>
+
+Composite-Sigs-Plus-2022
+
+DEFINITIONS IMPLICIT TAGS ::= BEGIN
+
+EXPORTS ALL;
+
+IMPORTS
+  PUBLIC-KEY, SIGNATURE-ALGORITHM, ParamOptions, AlgorithmIdentifier{}
+    FROM AlgorithmInformation-2009  -- RFC 5912 [X509ASN1]
+      { iso(1) identified-organization(3) dod(6) internet(1)
+        security(5) mechanisms(5) pkix(7) id-mod(0)
+        id-mod-algorithmInformation-02(58) }
+
+  SubjectPublicKeyInfo
+    FROM PKIX1Explicit-2009
+      { iso(1) identified-organization(3) dod(6) internet(1)
+        security(5) mechanisms(5) pkix(7) id-mod(0)
+        id-mod-pkix1-explicit-02(51) }
+
+  OneAsymmetricKey
+    FROM AsymmetricKeyPackageModuleV1
+      { iso(1) member-body(2) us(840) rsadsi(113549) pkcs(1)
+        pkcs-9(9) smime(16) modules(0)
+        id-mod-asymmetricKeyPkgV1(50) } ;
+
+  COMPOSITE-KEY-ALGORITHM, pk-Composite, CompositePublicKey, CompositePrivateKey, pk-explicitComposite, id-composite-key
+    FROM Composite-Keys-2022 -- {{I-D.draft-ounsworth-pq-sigs}}
+      { ... }
+--
+-- Object Identifiers
+--
+ 
+
+--
+-- Public Key
+--
+
+END
+
+<CODE ENDS>
+
+~~~
+
+
+# Intellectual Property Considerations
+
+The following IPR Disclosure relates to this draft:
+
+https://datatracker.ietf.org/ipr/3588/
+
+
+
+# Contributors and Acknowledgements
+This document incorporates contributions and comments from a large group of experts. The Editors would especially like to acknowledge the expertise and tireless dedication of the following people, who attended many long meetings and generated millions of bytes of electronic mail and VOIP traffic over the past year in pursuit of this document:
+
+John Gray (Entrust),
+Serge Mister (Entrust),
+Scott Fluhrer (Cisco Systems),
+Panos Kampanakis (Cisco Systems),
+Daniel Van Geest (ISARA),
+Tim Hollebeek (Digicert),
+Klaus-Dieter Wirth (D-Trust), and
+François Rousseau.
+
+We are grateful to all, including any contributors who may have
+been inadvertently omitted from this list.
+
+This document borrows text from similar documents, including those referenced below. Thanks go to the authors of those
+   documents.  "Copying always makes things easier and less error prone" - [RFC8411].
+
+## Making contributions
+
+Additional contributions to this draft are welcome. Please see the working copy of this draft at, as well as open issues at:
+
+https://github.com/EntrustCorporation/draft-ounsworth-pq-composite-keys
+
+
+<!-- End of Contributors section -->
