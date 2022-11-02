@@ -283,16 +283,20 @@ in the Composite case. Please refer to section 5.1 of {{-composite_sigs}}.
 ## Validating Composite Signatures {#validating}
 
 When validating composite signatures generated via MultiKey keys, the
-validation procedures are modified in two different ways:
-- Allowing some component signatures validation failures to occur before
-  failing the validation of the composite signature
-- Allowing to skip some component signature validation as needed
+validation procedures are modified to allow for a well-defined number
+of component signatures validation failures to occur before failing
+the validation of the composite signature as a whole.
+The possibility to be able to still consider a composite signature valid
+in the presence of unsupported protocols is a useful feature for
+guaranteeing the interoperability of newer devices with older ones that might not be
+able to correctly process all the algorithms (but they can still
+validate a subset of them).
 
-When validating signatures generated via MultiKey keys, the total number
-of successful component signature validations shall be equal or greater
-than the public key parameter `K` (when present). After that, additional
-component signatures may be skipped (or fail) their verification without
-impacting the validity of the whole composite signature.
+In fact, when validating signatures generated via MultiKey keys, the
+total number of successful component signature validations shall be equal
+or greater than the public key parameter `K` (when present). After that,
+additional component signatures' validations may be skipped (or fail)
+without impacting the validity of the whole composite signature.
 
 When the public key parameter `K` is absent or its value is set to the
 number of components in the signing key (i.e., `K = n`), the validation
