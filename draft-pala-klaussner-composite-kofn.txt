@@ -5,8 +5,8 @@
 LAMPS                                                            M. Pala
 Internet-Draft                                                 CableLabs
 Intended status: Standards Track                            J. Klaussner
-Expires: 1 May 2023                                         D-Trust GmbH
-                                                         28 October 2022
+Expires: 6 May 2023                                         D-Trust GmbH
+                                                         2 November 2022
 
 
          K-threshold Composite Signatures for the Internet PKI
@@ -53,12 +53,12 @@ Status of This Memo
 
 
 
-Pala & Klaussner           Expires 1 May 2023                   [Page 1]
+Pala & Klaussner           Expires 6 May 2023                   [Page 1]
 
-Internet-Draft              K-threshold Sigs                October 2022
+Internet-Draft              K-threshold Sigs               November 2022
 
 
-   This Internet-Draft will expire on 1 May 2023.
+   This Internet-Draft will expire on 6 May 2023.
 
 Copyright Notice
 
@@ -88,17 +88,17 @@ Table of Contents
      4.1.  Generating Composite Signatures . . . . . . . . . . . . .   7
      4.2.  Validating Composite Signatures . . . . . . . . . . . . .   7
    5.  Algorithm Identifiers . . . . . . . . . . . . . . . . . . . .   8
-     5.1.  Signature Algorithm Identifiers . . . . . . . . . . . . .   9
+     5.1.  Signature Algorithm Identifiers . . . . . . . . . . . . .   8
      5.2.  Public Key Algorithm Identifiers  . . . . . . . . . . . .   9
    6.  Deprecating Algorithms and Impact over signature
            validations . . . . . . . . . . . . . . . . . . . . . . .   9
-     6.1.  Distributing the list of deprecated algorithms  . . . . .  10
-   7.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  11
+     6.1.  Distributing the list of deprecated algorithms  . . . . .   9
+   7.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  10
    8.  Security Considerations . . . . . . . . . . . . . . . . . . .  11
    9.  References  . . . . . . . . . . . . . . . . . . . . . . . . .  11
      9.1.  Normative References  . . . . . . . . . . . . . . . . . .  11
      9.2.  Informative References  . . . . . . . . . . . . . . . . .  12
-   Appendix A.  Explicit Algorithm Identifiers . . . . . . . . . . .  13
+   Appendix A.  Explicit Algorithm Identifiers . . . . . . . . . . .  12
    Appendix B.  ASN.1 Module . . . . . . . . . . . . . . . . . . . .  13
    Appendix C.  Intellectual Property Considerations . . . . . . . .  14
    Appendix D.  Contributors and Acknowledgements  . . . . . . . . .  15
@@ -109,9 +109,9 @@ Table of Contents
 
 
 
-Pala & Klaussner           Expires 1 May 2023                   [Page 2]
+Pala & Klaussner           Expires 6 May 2023                   [Page 2]
 
-Internet-Draft              K-threshold Sigs                October 2022
+Internet-Draft              K-threshold Sigs               November 2022
 
 
 1.  Terminology
@@ -165,9 +165,9 @@ Internet-Draft              K-threshold Sigs                October 2022
 
 
 
-Pala & Klaussner           Expires 1 May 2023                   [Page 3]
+Pala & Klaussner           Expires 6 May 2023                   [Page 3]
 
-Internet-Draft              K-threshold Sigs                October 2022
+Internet-Draft              K-threshold Sigs               November 2022
 
 
    Even after the migration period, it may be advantageous for an entity
@@ -221,9 +221,9 @@ Internet-Draft              K-threshold Sigs                October 2022
 
 
 
-Pala & Klaussner           Expires 1 May 2023                   [Page 4]
+Pala & Klaussner           Expires 6 May 2023                   [Page 4]
 
-Internet-Draft              K-threshold Sigs                October 2022
+Internet-Draft              K-threshold Sigs               November 2022
 
 
 3.1.  1-threshold and K-threshold signature validation
@@ -277,9 +277,9 @@ Internet-Draft              K-threshold Sigs                October 2022
 
 
 
-Pala & Klaussner           Expires 1 May 2023                   [Page 5]
+Pala & Klaussner           Expires 6 May 2023                   [Page 5]
 
-Internet-Draft              K-threshold Sigs                October 2022
+Internet-Draft              K-threshold Sigs               November 2022
 
 
 3.3.  MultiKey Public Keys
@@ -333,9 +333,9 @@ Internet-Draft              K-threshold Sigs                October 2022
 
 
 
-Pala & Klaussner           Expires 1 May 2023                   [Page 6]
+Pala & Klaussner           Expires 6 May 2023                   [Page 6]
 
-Internet-Draft              K-threshold Sigs                October 2022
+Internet-Draft              K-threshold Sigs               November 2022
 
 
    The difference with the original sa-CompositeSignature definition is
@@ -360,39 +360,17 @@ Internet-Draft              K-threshold Sigs                October 2022
    the validation of the composite signature - Allowing to skip some
    component signature validation as needed
 
-   The total number of failed and skipped component signature validation
-   cannot exceed the K value encoded in the MultiKey-params integer
-   value.  When this happens, the composite signature MUST be considered
-   invalid.
+   The total number of successful component signature validations shall
+   at least reach the K value encoded in the MultiKey-params integer
+   value.  Other component signatures may be skipped or fail their
+   verification.  If less than 'K' component signatures validated
+   successfully, the composite signature MUST be considered invalid.
 
-   When compared to the composite signatures' validation process, the
-   only modified step is during the individual component's validation
-   for...loop where the invalid signature output is emitted only if the
-   number of failures (variable F) exceeds the value encoded in the
-   public key parameter (variable K).
+   When compared to the composite signatures' validation process, this
+   process finishes earlier if enough valid signatures are found.
 
    The Input and Output definitions are the same as defined in
    composite:
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Pala & Klaussner           Expires 1 May 2023                   [Page 7]
-
-Internet-Draft              K-threshold Sigs                October 2022
-
 
      Input:
           P1, P2, .., Pn    Public verification keys.
@@ -409,46 +387,49 @@ Internet-Draft              K-threshold Sigs                October 2022
                              signature is valid, "Invalid signature"
                              (false) otherwise.
 
+
+
+Pala & Klaussner           Expires 6 May 2023                   [Page 7]
+
+Internet-Draft              K-threshold Sigs               November 2022
+
+
    The following process is used to perform composite signatures
    verification with a MultiKey key:
 
-      1. Check keys, signatures, and algorithms for consistency.
+1. Check keys, signatures, and algorithms for consistency.
 
-         If Error during desequencing, or the three sequences
-         have different numbers of elements, or any of the public
-         keys P1, P2, .., Pn or algorithm identifiers A1, A2, ..,
-         An are multikey with the OID id-alg-composite or an
-         explicit composite OID then output "Invalid signature"
-         and stop.
+   If Error during desequencing, or the three sequences
+   have different numbers of elements, or any of the public
+   keys P1, P2, .., Pn or algorithm identifiers A1, A2, ..,
+   An are multikey with the OID id-alg-composite or an
+   explicit composite OID then output "Invalid signature"
+   and stop.
 
-      2. Check each component signature individually, according to
-         its algorithm specification. If the number of failures
-         exceed the parameter K, then the entire signature validation
-         fails.
+2. Check each component signature individually, according to
+   its algorithm specification. Parameter K holds the number of successful
+   validations yet required and is reduced as soon as a component signature is verified.
+   If K reaches 0, the entire signature validation
+   succeeds. If all component signatures are processed and K is not 0, The Validation as whole fails.
 
-         K := MultiKey-params | 0
-         F := 0
-         for i := 1 to n:
-           if not verify( Pi, M, Si, Ai ) and F > K:
-             output "Invalid signature"
-           else:
-             F++
+   if MultiKey-params
+     K := MultiKey-params
+   else
+     K := n
 
-      3. Output "Valid signature"
+   for i := 1 to n:
+     if verify( Pi, M, Si, Ai ):
+       K := K - 1
+       if K = 0:
+         Output "Valid signature"
+
+   Output "Invalid signature"
 
 5.  Algorithm Identifiers
 
    In this work, we define a set of OIDs that allow for assigning
    explicit algorithm combination to specific MultiKey keys
    configuration.
-
-
-
-
-Pala & Klaussner           Expires 1 May 2023                   [Page 8]
-
-Internet-Draft              K-threshold Sigs                October 2022
-
 
    Please refer to Appendix Section 5 for more details about explicit
    MultiKey identifiers.
@@ -459,6 +440,15 @@ Internet-Draft              K-threshold Sigs                October 2022
    leverages the extends the definitions of composite signatures defined
    in [I-D.ounsworth-pq-composite-sigs] with the addition of the pk-
    multikey-key in the PUBLIC-KEYS set.
+
+
+
+
+
+Pala & Klaussner           Expires 6 May 2023                   [Page 8]
+
+Internet-Draft              K-threshold Sigs               November 2022
+
 
 5.2.  Public Key Algorithm Identifiers
 
@@ -498,14 +488,6 @@ Internet-Draft              K-threshold Sigs                October 2022
    the list of revoked algorithms, exactly in the same fashion as when
    the algorithm is not supported in the first place.
 
-
-
-
-Pala & Klaussner           Expires 1 May 2023                   [Page 9]
-
-Internet-Draft              K-threshold Sigs                October 2022
-
-
 6.1.  Distributing the list of deprecated algorithms
 
    As we just mentioned, in MultiKey environments, there are situations
@@ -516,6 +498,14 @@ Internet-Draft              K-threshold Sigs                October 2022
    On top of that, there are also typical use-cases where the
    deprecation of an algorithm is paramount to make sure that
    authentications do not rely only on deprecated algorithms.  This is
+
+
+
+Pala & Klaussner           Expires 6 May 2023                   [Page 9]
+
+Internet-Draft              K-threshold Sigs               November 2022
+
+
    the case, for example, when older devices that can only successfully
    validate one algorithm from a composite signature (e.g., it can
    validate RSA signatures but no other) are still part of the network.
@@ -551,17 +541,6 @@ Internet-Draft              K-threshold Sigs                October 2022
          internet(1) private(4) enterprise(1) OpenCA(18227)
          Extensions(3) deprecated-algs (2) }
 
-
-
-
-
-
-
-Pala & Klaussner           Expires 1 May 2023                  [Page 10]
-
-Internet-Draft              K-threshold Sigs                October 2022
-
-
 7.  IANA Considerations
 
    This document registers the following in the SMI "Security for PKIX
@@ -574,6 +553,14 @@ Internet-Draft              K-threshold Sigs                October 2022
    This document registers the following in the SMI " " registry:
 
    id-ce-deprecatedAlgsList OBJECT IDENTIFIER ::= { id-ce deprecatedAlgsList(??) }
+
+
+
+
+Pala & Klaussner           Expires 6 May 2023                  [Page 10]
+
+Internet-Draft              K-threshold Sigs               November 2022
+
 
 8.  Security Considerations
 
@@ -607,17 +594,6 @@ Internet-Draft              K-threshold Sigs                October 2022
               DOI 10.17487/RFC4210, September 2005,
               <https://www.rfc-editor.org/info/rfc4210>.
 
-
-
-
-
-
-
-Pala & Klaussner           Expires 1 May 2023                  [Page 11]
-
-Internet-Draft              K-threshold Sigs                October 2022
-
-
    [RFC4211]  Schaad, J., "Internet X.509 Public Key Infrastructure
               Certificate Request Message Format (CRMF)", RFC 4211,
               DOI 10.17487/RFC4211, September 2005,
@@ -632,6 +608,15 @@ Internet-Draft              K-threshold Sigs                October 2022
    [RFC5958]  Turner, S., "Asymmetric Key Packages", RFC 5958,
               DOI 10.17487/RFC5958, August 2010,
               <https://www.rfc-editor.org/info/rfc5958>.
+
+
+
+
+
+Pala & Klaussner           Expires 6 May 2023                  [Page 11]
+
+Internet-Draft              K-threshold Sigs               November 2022
+
 
    [RFC6960]  Santesson, S., Myers, M., Ankney, R., Malpani, A.,
               Galperin, S., and C. Adams, "X.509 Internet Public Key
@@ -667,13 +652,6 @@ Internet-Draft              K-threshold Sigs                October 2022
               <https://www.ietf.org/archive/id/draft-driscoll-pqt-
               hybrid-terminology-01.txt>.
 
-
-
-Pala & Klaussner           Expires 1 May 2023                  [Page 12]
-
-Internet-Draft              K-threshold Sigs                October 2022
-
-
 Appendix A.  Explicit Algorithm Identifiers
 
    This variant provides a rigid way of specifying supported
@@ -686,6 +664,15 @@ Appendix A.  Explicit Algorithm Identifiers
    referencing and/or enforcing specific combinations of algorithms
    without the need for developing additional validation procedures
    external to the signature validation one.
+
+
+
+
+
+Pala & Klaussner           Expires 6 May 2023                  [Page 12]
+
+Internet-Draft              K-threshold Sigs               November 2022
+
 
    Explicit algorithms must define a new signature algorithm which
    consists of:
@@ -725,9 +712,22 @@ Appendix B.  ASN.1 Module
 
 
 
-Pala & Klaussner           Expires 1 May 2023                  [Page 13]
+
+
+
+
+
+
+
+
+
+
+
+
+
+Pala & Klaussner           Expires 6 May 2023                  [Page 13]
 
-Internet-Draft              K-threshold Sigs                October 2022
+Internet-Draft              K-threshold Sigs               November 2022
 
 
    <CODE STARTS>
@@ -781,9 +781,9 @@ Appendix C.  Intellectual Property Considerations
 
 
 
-Pala & Klaussner           Expires 1 May 2023                  [Page 14]
+Pala & Klaussner           Expires 6 May 2023                  [Page 14]
 
-Internet-Draft              K-threshold Sigs                October 2022
+Internet-Draft              K-threshold Sigs               November 2022
 
 
    https://datatracker.ietf.org/ipr/3588/
@@ -825,21 +825,7 @@ Authors' Addresses
    858 Coal Creek Cir
    Louisville, Colorado,  80027
    United States of America
-
    Email: director@openca.org
-
-
-
-
-
-
-
-
-
-
-Pala & Klaussner           Expires 1 May 2023                  [Page 15]
-
-Internet-Draft              K-threshold Sigs                October 2022
 
 
    Jan Klaussner
@@ -847,50 +833,8 @@ Internet-Draft              K-threshold Sigs                October 2022
    Kommandantenstr. 15
    10969 Berlin
    Germany
-
    Email: jan.klaussner@d-trust.net
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Pala & Klaussner           Expires 1 May 2023                  [Page 16]
+Pala & Klaussner           Expires 6 May 2023                  [Page 15]
