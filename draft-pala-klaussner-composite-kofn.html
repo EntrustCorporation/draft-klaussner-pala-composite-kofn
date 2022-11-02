@@ -28,25 +28,26 @@ component algorithm as defined in   and
 
 
     " name="description">
-<meta content="xml2rfc 3.12.1" name="generator">
+<meta content="xml2rfc 3.12.8" name="generator">
 <meta content="Internet-Draft" name="keyword">
 <meta content="draft-pala-klaussner-composite-kofn-00" name="ietf.draft">
 <!-- Generator version information:
-  xml2rfc 3.12.1
-    Python 3.9.15
+  xml2rfc 3.12.8
+    Python 3.8.13
     appdirs 1.4.4
     ConfigArgParse 1.5.3
-    google-i18n-address 2.5.0
+    google-i18n-address 2.5.1
     html5lib 1.1
     intervaltree 3.1.0
     Jinja2 2.11.3
     kitchen 1.2.6
-    lxml 4.6.3
-    pycountry 22.1.10
+    lxml 4.8.0
+    MarkupSafe 2.0.1
+    pycountry 22.3.5
     pyflakes 2.4.0
-    PyYAML 5.4.1
-    requests 2.25.1
-    setuptools 65.4.1
+    PyYAML 6.0
+    requests 2.27.1
+    setuptools 62.3.2
     six 1.16.0
 -->
 <link href="draft-pala-klaussner-composite-kofn.xml" rel="alternate" type="application/rfc+xml">
@@ -673,6 +674,9 @@ hr.addr {
   figure {
     overflow: scroll;
   }
+  pre.breakable {
+    break-inside: auto;
+  }
   h1, h2, h3, h4, h5, h6 {
     page-break-after: avoid;
   }
@@ -1204,11 +1208,11 @@ li > p:last-of-type {
 <thead><tr>
 <td class="left">Internet-Draft</td>
 <td class="center">K-threshold Sigs</td>
-<td class="right">October 2022</td>
+<td class="right">November 2022</td>
 </tr></thead>
 <tfoot><tr>
 <td class="left">Pala &amp; Klaussner</td>
-<td class="center">Expires 1 May 2023</td>
+<td class="center">Expires 6 May 2023</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1221,12 +1225,12 @@ li > p:last-of-type {
 <dd class="internet-draft">draft-pala-klaussner-composite-kofn-00</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2022-10-28" class="published">28 October 2022</time>
+<time datetime="2022-11-02" class="published">2 November 2022</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Standards Track</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2023-05-01">1 May 2023</time></dd>
+<dd class="expires"><time datetime="2023-05-06">6 May 2023</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1278,7 +1282,7 @@ component algorithm as defined in <span>[<a href="#I-D.ounsworth-pq-composite-si
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 1 May 2023.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 6 May 2023.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1655,15 +1659,12 @@ validation procedures are modified in two different ways:
 - Allowing some component signatures validation failures to occur before
   failing the validation of the composite signature
 - Allowing to skip some component signature validation as needed<a href="#section-4.2-1" class="pilcrow">¶</a></p>
-<p id="section-4.2-2">The total number of failed and skipped component signature validation
-cannot exceed the <code>K</code> value encoded in the MultiKey-params integer value.
-When this happens, the composite signature MUST be considered
+<p id="section-4.2-2">The total number of successful component signature validations
+shall at least reach the <code>K</code> value encoded in the MultiKey-params integer value.
+Other component signatures may be skipped or fail their verification. If less than 'K' component signatures validated successfully, the composite signature MUST be considered
 invalid.<a href="#section-4.2-2" class="pilcrow">¶</a></p>
-<p id="section-4.2-3">When compared to the composite signatures' validation process, the only
-modified step is during the individual component's validation for...loop
-where the invalid signature output is emitted only if the number of
-failures (variable <code>F</code>) exceeds the value encoded in the public key
-parameter (variable <code>K</code>).<a href="#section-4.2-3" class="pilcrow">¶</a></p>
+<p id="section-4.2-3">When compared to the composite signatures' validation process, this process
+finishes earlier if enough valid signatures are found.<a href="#section-4.2-3" class="pilcrow">¶</a></p>
 <p id="section-4.2-4">The Input and Output definitions are the same as defined in composite:<a href="#section-4.2-4" class="pilcrow">¶</a></p>
 <div class="alignCenter art-text artwork" id="section-4.2-5">
 <pre>
@@ -1697,19 +1698,23 @@ with a MultiKey key:<a href="#section-4.2-6" class="pilcrow">¶</a></p>
    and stop.
 
 2. Check each component signature individually, according to
-   its algorithm specification. If the number of failures
-   exceed the parameter K, then the entire signature validation
-   fails.
+   its algorithm specification. Parameter K holds the number of successful
+   validations yet required and is reduced as soon as a component signature is verified.
+   If K reaches 0, the entire signature validation
+   succeeds. If all component signatures are processed and K is not 0, The Validation as whole fails.
 
-   K := MultiKey-params | 0
-   F := 0
+   if MultiKey-params
+     K := MultiKey-params
+   else
+     K := n
+
    for i := 1 to n:
-     if not verify( Pi, M, Si, Ai ) and F &gt; K:
-       output "Invalid signature"
-     else:
-       F++
+     if verify( Pi, M, Si, Ai ):
+       K := K - 1
+       if K = 0:
+         Output "Valid signature"
 
-3. Output "Valid signature"
+   Output "Invalid signature"
 </pre><a href="#section-4.2-7" class="pilcrow">¶</a>
 </div>
 </section>
