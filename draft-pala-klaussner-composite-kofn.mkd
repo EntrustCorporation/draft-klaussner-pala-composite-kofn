@@ -288,13 +288,31 @@ validation procedures are modified in two different ways:
   failing the validation of the composite signature
 - Allowing to skip some component signature validation as needed
 
-The total number of successful component signature validations
-shall at least reach the `K` value encoded in the MultiKey-params integer value.
-Other component signatures may be skipped or fail their verification. If less than 'K' component signatures validated successfully, the composite signature MUST be considered
-invalid.
+When validating signatures generated via MultiKey keys, the total number
+of successful component signature validations shall be equal or greater
+than the public key parameter `K` (when present). After that, additional
+component signatures may be skipped (or fail) their verification without
+impacting the validity of the whole composite signature.
 
-When compared to the composite signatures' validation process, this process
-finishes earlier if enough valid signatures are found.
+When the public key parameter `K` is absent or its value is set to the
+number of components in the signing key (i.e., `K = n`), the validation
+process for MultiKey and Composite are the same.
+
+When the public key parameter `K` is set to one (`1`), the validation
+process for MultiKey provides support for fully alternative signatures
+where a single successful component signature's validation validates
+the whole composite signature.
+
+When compared to the composite signatures' validation process, we modify
+the for..loop cycle where the invalid signature output is not emitted 
+after the first validation failure, but only if the number of remaining
+successful validations is larger than the number of remaining
+validations.
+
+The second optimization allowed by MultiKey keys is to be able to consider
+a composite signature successful right after at least `K` successful
+component signatures' validations, without the need for even attempting
+at performing the remaining ones.
 
 The Input and Output definitions are the same as defined in composite:
 
@@ -335,17 +353,28 @@ with a MultiKey key:
    If K reaches 0, the entire signature validation
    succeeds. If all component signatures are processed and K is not 0, The Validation as whole fails.
 
-   if MultiKey-params
+   IF MultiKey-params
      K := MultiKey-params
-   else
+   ELSE
      K := n
 
-   for i := 1 to n:
-     if verify( Pi, M, Si, Ai ):
-       K := K - 1
-       if K = 0:
-         Output "Valid signature"
+   FOR i := 1 TO n:
+     IF verify( Pi, M, Si, Ai ):
+       K--
+     IF (K == 0):
+       Output "Valid signature"
+     IF (n - i < K):
+       Output "Invalid Signature"
 
+K := MultiKey-params(1..max) | n
+   F := 0 
+   for i := 1 to n:
+     if not verify( Pi, M, Si, Ai ) and F > n - K:
+       output "Invalid signature"
+     else:
+       F++
+     if (i - F >= K):
+       break;
    Output "Invalid signature"
 ~~~
 {: artwork-align="center" artwork-name="alg-sig-verify" }
