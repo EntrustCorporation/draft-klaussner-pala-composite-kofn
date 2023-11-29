@@ -84,7 +84,7 @@ of devices via test drivers and/or non-standard algorithms. Another very common 
 certified cryptography (e.g., FIPS) with newer algorithms that are not yet certified or that are not planned
 for certification.
 
-This work extends the options provided by Explicit Composite, defined in {{composite_sigs}}, by providing a
+This work extends the options provided by Explicit Composite, defined in {{-composite_sigs}}, by providing a
 mechanism to manage backward and forward compatibility via k-of-n signature validation procedures.
 
 This document provides the definition of a new type of the kofn-CompositePublicKey and kofn-CompositeSignature
@@ -122,7 +122,7 @@ COMPONENT KEY:
 
 COMPOSITE ALGORITHM:
           An algorithm which is a sequence of two or more component
-          algorithms, as defined in {{sec-composite-structs}}.
+          algorithms, as defined in {{sec_kofn_keys}}.
 
 CLIENT:
           Any software that is making use of a cryptographic key.
@@ -288,7 +288,7 @@ OID defined as follows:
 ~~~
 {: artwork-name="id-kofn-CompositeCrypto OID definition" artwork-align="center" }
 
-## K-of-N Composite Key Generation
+## K-of-N Composite Key Generation {#sec_kofn_keygen}
 
 The `KeyGen() -> (pk, sk)` is defined as a probabilistic key generation algorithm,
 which generates a public key pk and a secret key sk.
@@ -343,7 +343,7 @@ The parameters field is of type kofn-CompositeKeyParams:
 {: artwork-name="K-of-N Composite Key Parameters ASN.1 structures"}
 
 The use of any Composite algorithms (e.g., the `pk-kofn-CompositePublicKey` or any of the
-Explicit Composite algorithms defined in {{composite_sigs}}) is NOT allowed as a component
+Explicit Composite algorithms defined in {{-composite_sigs}}) is NOT allowed as a component
 of a `kofn-CompositePrivateKey`.
 
 The order of the component keys MUST be the same as the order defined for the corresponding
@@ -381,7 +381,7 @@ provided as follows:
 {: artwork-name="pk-kofn-CompositePublicKey-asn.1-structures" artwork-align="center" }
 
 The use of any Composite algorithms (e.g., the `pk-kofn-CompositePublicKey` or any of the
-Explicit Composite algorithms defined in {{composite_sigs}} is NOT allowed as a component
+Explicit Composite algorithms defined in {{-composite_sigs}} is NOT allowed as a component
 of a `pk-kofn-CompositePublicKey`.
 
 # K-of-N Composite Signatures {#sec_kofn_sigs}
@@ -417,7 +417,7 @@ The `kofn-CompositeSignatureParams` and `sa-kofn-CompositeSignature` structures 
 When a K-of-N Composite Public Key has no defined `hashAlgorithm` parameter, the signer MUST
 include the `hashAlgorithm` parameter in the `kofn-CompositeSignatureParams` structure to
 specify which hash algorithm was used to pre-hash the message before signing as described in
-{{signature_process}}.
+{{sec_kofn_sigs}}.
 
 When a K-of-N Composite Public Key has the `hashAlgorithm` parameter defined, the signer MUST
 NOT include the `hashAlgorithm` parameter in the `kofn-CompositeSignatureParams` structure.
@@ -427,7 +427,7 @@ contain the `hashAlgorithm` parameter, the verifier MUST ignore the `hashAlgorit
 from the `kofn-CompositeSignatureParams` structure and use the one from the K-of-N Composite
 Public Key.
 
-## K-of-N Composite Signature Processes {#signature_process}
+## K-of-N Composite Signature Processes {#sec_kofn_processes}
 
 In this section we define K-of-N Composite Signatures as a cryptographic primitive that consists
 of three algorithms. The first one is the `kofn-KeyGen()` and is defined in {{sec_kofn_keys}}.
@@ -445,7 +445,7 @@ The remaining two algorithms are the `Sign()` and `Verify()` algorithms, which a
   key associated with the public key and verifies the integrity of the Message.
   If the signature and public key cannot verify the Message, it returns false.
 
-## The kofn-Sign() primitive {#signing}
+## The kofn-Sign() primitive {#sec_kofn_sign}
 
 When using K-of-N Composite Private Keys to generate signatures, the process is
 the same as in the Explicit Composite case (see section 5.1 of {{-composite_sigs}}).
@@ -454,7 +454,7 @@ Specifically, the generation of a K-of-N Composite signature involves pre-hashin
 the message to be signed with key-binding data to provide non-separability properties
 for the signature, and then applying each component algorithm's signature process to
 the modified input message according to its specification. Each component signature value
-is then placed into the CompositeSignatureValue structure defined in {{sec-composite-sig-structs}}.
+is then placed into the CompositeSignatureValue structure defined in {{sec_kofn_sig_structs}}.
 
 The following process is used to generate composite signature values.
 
@@ -518,7 +518,7 @@ A composite signature MUST produce, and include in the output, a signature value
 in the corresponding `kofn-CompositePublicKey`, and they MUST be in the same order; ie in the output, S1
 MUST correspond to K1, S2 to K2, ..., and SN to KN.
 
-## The kofn-Verify() primitive {#validating}
+## The kofn-Verify() primitive {#sec_kofn_verify}
 
 When validating composite signatures generated via `id-kofn-CompositeCrypto`
 algorithm, the validation procedures, when compared to the Explicit Composite,
@@ -600,6 +600,8 @@ with a K-of-N Composite algorithm:
 2. Construct the modified message M' to be used for the validation
     process with each component signature.
 
+    M' = HASH(Message)
+
     Set the initial counter `X` to zero to indicate the number
     of unsupported algorithms encountered during the validation
     process.
@@ -610,26 +612,28 @@ with a K-of-N Composite algorithm:
   3.a Check the support for each component of the signature against
       the number of required supported algorithms (`threshold`).
 
-    If the public key parameter `threshold` is NOT set and the
-    component signature algorithm is not supported, the validation
-    fails, output "Invalid signature" and stop.
-    
-    If the public key parameter `threshold` is set and the component
-    signature is not supported, the counter `X` is incremented. If `X`
-    is greater than `N - K`, the validation fails, output "Invalid
-    signature" and stop.
-    
-    If a component signature is not supported and the corresponding
-    `isRequired` field of the associated `kofn-CompositeComponentKeyParams`
-    is present and set to `TRUE`, the validation fails, output
-    "Invalid signature" and stop.
+      If the public key parameter `threshold` is NOT set and the
+      component signature algorithm is not supported, the validation
+      fails, output "Invalid signature" and stop.
+      
+      If the public key parameter `threshold` is set and the component
+      signature is not supported, the counter `X` is incremented. If `X`
+      is greater than `N - K`, the validation fails, output "Invalid
+      signature" and stop.
+      
+      If a component signature is not supported and the corresponding
+      `isRequired` field of the associated `kofn-CompositeComponentKeyParams`
+      is present and set to `TRUE`, the validation fails, output
+      "Invalid signature" and stop.
 
   3.b Check each component signature individually, according to
-    its algorithm specification.
+      its algorithm specification.
 
-    If any of the component signatures S1, S2, .., Sn is not
-    correctly validated according to the component's algorithm,
-    the validation fails, output "Invalid signature" and stop.
+        Result := Verify(Kx, Ax, OID || M')
+
+      If any of the component signatures S1, S2, .., Sn is not
+      correctly validated according to the component's algorithm,
+      the validation fails, output "Invalid signature" and stop.
 
 4. Output "Valid signature"
 ~~~
@@ -755,7 +759,7 @@ consists of:
 The definition of the explicit algorithm identifiers follows
 the same definitions provided in Section 4.2 of {{-composite_keys}}
 with the exception of the parameters that are not ABSENT but
-OPTIONAL and their TYPE is MultiKey-params as defined in {{public_keys}}.
+OPTIONAL and their TYPE is MultiKey-params as defined in {{sec_kofn_pub_keys}}.
 
 
 # ASN.1 Module
