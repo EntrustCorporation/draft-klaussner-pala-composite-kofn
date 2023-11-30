@@ -148,12 +148,14 @@ K-of-N:
           at least k of the n component signatures are supported.
 
 N:
-          The number of component signatures in a K-of-N signature.
+          The number of component signatures in a K-of-N signature. The
+          maximum value of `N` is `kofn-CompositeComponentsMax` (16).
 
 K:
           The number of component signatures that must be supported
           (and correctly validated) in order for the k-of-n signature
-          to be valid.
+          to be valid. The maximum value of `K` is `kofn-CompositeThresholdMax`
+          (15).
 
 SIGNATURE:
           A digital cryptographic signature, making no assumptions
@@ -221,7 +223,7 @@ all devices.  -->
 This work introduces the concept of K-of-N threshold signatures which joins the
 family of hybrid options such as the Explicit Composite signatures and KEMs.
 
-## Comparison between K-of-N Composite and Explicit Composite {#overview}
+## Differences between K-of-N Composite and Explicit Composite {#overview}
 
 K-of-N Composite keys and signatures work very similarly to Explicit Composite signatures.
 
@@ -253,6 +255,9 @@ signature is not correctly verified.
 In this work, we define `N` the number of component key in the K-of-N Composite key, and
 `K` the minimum number of component algorithms that must be supported by the cypto layer
 (and successfully verified) for the K-of-N Composite signature to be considered valid.
+The maximum allowed value for `N` is `kofn-CompositeComponentsMax` (16) and the maximum
+allowed value for `K` is `kofn-CompositeThresholdMax` (15). When `K` is used, it MUST be
+less than `N` to allow for `N - K` algorithms to be skipped (if unknown).
 
 <!-- ## 1-threshold and K-threshold signature validation {#threshold}
 
@@ -317,17 +322,23 @@ The K-of-N Composite private key data use the same structure as in CompositePriv
 where each component key is a OneAsymmetricKey {{!RFC5958}} object:
 
 ~~~ ASN.1
-  kofn-CompositePrivateKey ::= SEQUENCE SIZE (2..MAX) OF OneAsymmetricKey
+
+  kofn-CompositeComponentsMax INTEGER ::= 16
+      -- Maximum number of allowed components in a Key
+
+  kofn-CompositePrivateKey ::= SEQUENCE SIZE (2..kofn-CompositeComponentsMax) OF OneAsymmetricKey
 ~~~
 {: artwork-name="K-of-N Composite Private Key ASN.1 structures"}
 
-The parameters field is of type kofn-CompositeKeyParams:
+The parameters field is of type `kofn-CompositeKeyParams` and is defined as follows:
 
 ~~~asn.1
 
-  kofn-CompositeThresholdMax ::= INTEGER (16)
+  kofn-CompositeThresholdMax INTEGER ::= 15
+      -- Maximum number of allowed components in a Key
 
   kofn-CompositeThreshold ::= INTEGER (1..kofn-CompositeThresholdMax)
+      -- Maximum value for required algoritmic threshold
 
   kofn-CompositeComponentKeyParams ::= SEQUENCE {
     componentAlgorithm      algorithmIdentifier,
@@ -342,9 +353,9 @@ The parameters field is of type kofn-CompositeKeyParams:
 ~~~
 {: artwork-name="K-of-N Composite Key Parameters ASN.1 structures"}
 
-The use of any Composite algorithms (e.g., the `pk-kofn-CompositePublicKey` or any of the
-Explicit Composite algorithms defined in {{-composite_sigs}}) is NOT allowed as a component
-of a `kofn-CompositePrivateKey`.
+The use of any Composite or hybrid algorithm (e.g., the `pk-kofn-CompositePublicKey` or any
+of the Explicit Composite algorithms defined in {{-composite_sigs}}) is NOT allowed as a
+component of a `kofn-CompositePrivateKey`.
 
 The order of the component keys MUST be the same as the order defined for the corresponding
 public key components.
@@ -361,18 +372,18 @@ In some usecases the private keys that comprise a composite key may not be repre
 single structure or even be contained in a single cryptographic module; for example if one
 component is within the FIPS boundary of a cryptographic module and the other is not; see
 {sec-fips} for more discussion. The establishment of correspondence between public keys in a
-kofn-CompositePublicKey and kofn-CompositePrivateKey not represented in a single composite
+`kofn-CompositePublicKey` and `kofn-CompositePrivateKey` not represented in a single composite
 structure is beyond the scope of this document.
 
 ## K-of-N Composite Public Keys {#sec_kofn_pub_keys}
 
-K-of-N Composite Public Keys are identified by the `id-kofn-CompositeKey` OID and the
+K-of-N Composite Public Keys are identified by the `id-kofn-CompositeCrypto` OID and the
 associated definition of K-of-N Composite public key (`pk-kofn-CompositePublicKey`) is
 provided as follows:
 
 ~~~ ASN.1
   pk-kofn-CompositePublicKey PUBLIC-KEY ::= {
-    id id-kofn-CompositePublicKey
+    id id-kofn-CompositeCrypto
     KeyValue pk-kofn-CompositePublicKey
     Params TYPE kofn-CompositeKeyParams ARE required
     PrivateKey kofn-CompositePrivateKey
@@ -398,15 +409,13 @@ verify algorithms are to be considered as a single atomic operations.
 # K-of-N Composite Signature Structure {#sec_kofn_sig_structs}
 
 The `kofn-CompositeSignatureParams` and `sa-kofn-CompositeSignature` structures are defined as follows:
+<!-- The `sa-kofn-CompositeSignature` structure is defined as follows: -->
 
 ~~~ ASN.1
-  kofn-CompositeSignatureParams ::= SEQUENCE {
-    hashAlgorithm           OBJECT IDENTIFIER OPTIONAL
-        --- hash algorithm OID used for pre-hashing, default is SHA384
-  }
+  <!-- kofn-CompositeSignatureParams ::= OBJECT IDENTIFIER DEFAULT(SHA512) -->
 
   sa-kofn-CompositeSignature SIGNATURE-ALGORITHM ::= {
-        IDENTIFIER id-kofn-CompositeSignature
+        IDENTIFIER id-kofn-CompositeCrypto
         VALUE kofn-CompositeSignatureValue
         PARAMS kofn-CompositeSignatureParams ARE optional
         PUBLIC-KEYS { pk-kofn-CompositePublicKey }
@@ -488,7 +497,7 @@ Signature Generation Process:
   2. Generate the n component signatures independently,
       according to their algorithm specifications.
 
-        S1 := Sign( K1, A1, OID || M' )
+        S1 := Sign( K1, A1, DER(OID) || DER(kofn-CompositeKeyParams) || M' )
         ...
         SN := Sign( KN, AN, OID || M' )
 
@@ -598,42 +607,42 @@ with a K-of-N Composite algorithm:
    then output "Invalid signature" and stop.
 
 2. Construct the modified message M' to be used for the validation
-    process with each component signature.
+   process with each component signature.
 
-    M' = HASH(Message)
+       M' = HASH(Message)
 
-    Set the initial counter `X` to zero to indicate the number
-    of unsupported algorithms encountered during the validation
-    process.
+   Set the initial counter `X` to zero to indicate the number
+   of unsupported algorithms encountered during the validation
+   process.
 
 3. Process each signature component in order, from S1 to Sn 
-    as follows:
+   as follows:
     
-  3.a Check the support for each component of the signature against
-      the number of required supported algorithms (`threshold`).
+   3.a Check the support for each component of the signature against
+       the number of required supported algorithms (`threshold`).
 
-      If the public key parameter `threshold` is NOT set and the
-      component signature algorithm is not supported, the validation
-      fails, output "Invalid signature" and stop.
-      
-      If the public key parameter `threshold` is set and the component
-      signature is not supported, the counter `X` is incremented. If `X`
-      is greater than `N - K`, the validation fails, output "Invalid
-      signature" and stop.
-      
-      If a component signature is not supported and the corresponding
-      `isRequired` field of the associated `kofn-CompositeComponentKeyParams`
-      is present and set to `TRUE`, the validation fails, output
-      "Invalid signature" and stop.
+       If the public key parameter `threshold` is NOT set and the
+       component signature algorithm is not supported, the validation
+       fails, output "Invalid signature" and stop.
+        
+       If the public key parameter `threshold` is set and the component
+       signature is not supported, the counter `X` is incremented. If `X`
+       is greater than `N - K`, the validation fails, output "Invalid
+       signature" and stop.
+        
+       If a component signature is not supported and the corresponding
+       `isRequired` field of the associated `kofn-CompositeComponentKeyParams`
+       is present and set to `TRUE`, the validation fails, output
+       "Invalid signature" and stop.
 
-  3.b Check each component signature individually, according to
-      its algorithm specification.
+   3.b Check each component signature individually, according to
+       its algorithm specification.
 
-        Result := Verify(Kx, Ax, OID || M')
+           Result := Verify(Kx, Ax, DER(OID) || DER(kofn-CompositeKeyParams) || M')
 
-      If any of the component signatures S1, S2, .., Sn is not
-      correctly validated according to the component's algorithm,
-      the validation fails, output "Invalid signature" and stop.
+       If any of the component signatures S1, S2, .., Sn is not
+       correctly validated according to the component's algorithm,
+       the validation fails, output "Invalid signature" and stop.
 
 4. Output "Valid signature"
 ~~~
@@ -766,16 +775,16 @@ OPTIONAL and their TYPE is MultiKey-params as defined in {{sec_kofn_pub_keys}}.
 
 ~~~ ASN.1
 
-<CODE STARTS>
-
-MultiKey-2022
+   kofn-Composite-Crypto-2023
+     { joint-iso-itu-t(2) country(16) us(840) organization(1) OpenCA(18277) 
+       Algorithms(2) PublicKey(1) kofn-CompositeCrypto(2) }
 
 DEFINITIONS IMPLICIT TAGS ::= BEGIN
 
 EXPORTS ALL;
 
 IMPORTS
-  PUBLIC-KEY, SIGNATURE-ALGORITHM, ParamOptions, AlgorithmIdentifier{}
+  PUBLIC-KEY, SIGNATURE-ALGORITHM, AlgorithmIdentifier{}
     FROM AlgorithmInformation-2009  -- RFC 5912 [X509ASN1]
       { iso(1) identified-organization(3) dod(6) internet(1)
         security(5) mechanisms(5) pkix(7) id-mod(0)
@@ -791,24 +800,86 @@ IMPORTS
     FROM AsymmetricKeyPackageModuleV1
       { iso(1) member-body(2) us(840) rsadsi(113549) pkcs(1)
         pkcs-9(9) smime(16) modules(0)
-        id-mod-asymmetricKeyPkgV1(50) } ;
-
-  COMPOSITE-KEY-ALGORITHM, pk-Composite, CompositePublicKey, 
-    CompositePrivateKey, pk-explicitComposite, id-composite-key
-    FROM Composite-Keys-2022 -- {{I-D.draft-ounsworth-pq-sigs}}
-      { ... }
+        id-mod-asymmetricKeyPkgV1(50) } 
+       
+;       
+        
 --
 -- Object Identifiers
 --
- 
+
+-- Defined in ITU-T X.690
+der OBJECT IDENTIFIER ::=
+  {joint-iso-itu-t asn1(1) ber-derived(2) distinguished-encoding(1)}
+
+id-kofn-CompositeCrypto OBJECT IDENTIFIER ::= {
+   iso(1) identified-organization(3) dod(6)
+   internet(1) private(4) enterprise(1) OpenCA(18227)
+   Algorithms(2) PublicKey(1) Experimental(999)
+   kofn-CompositeCrypto(2)
+}
+
+id-ce-deprecatedAlgsList OBJECT IDENTIFIER ::= { 
+   iso(1) identified-organization(3) dod(6) 
+   internet(1) private(4) enterprise(1) OpenCA(18227)
+   Extensions(3) deprecated-algs (2)
+}
 
 --
--- Public Key
+-- Constants
 --
+
+kofn-CompositeComponentsMax INTEGER ::= 16
+      -- Maximum number of allowed components in a Key
+
+kofn-CompositeThresholdMax INTEGER ::= 15
+      -- Maximum value for required algoritmic threshold
+
+--
+-- Private Keys
+--
+
+kofn-CompositePrivateKey ::= SEQUENCE SIZE (2..kofn-CompositeComponentsMax) OF OneAsymmetricKey
+
+--
+-- Public Keys
+--
+
+kofn-CompositeThreshold ::= INTEGER (1..kofn-CompositeThresholdMax)
+
+kofn-CompositeComponentKeyParams ::= SEQUENCE {
+   componentAlgorithm      algorithmIdentifier,
+   isRequired              BOOLEAN DEFAULT TRUE OPTIONAL,
+}
+
+kofn-CompositeKeyParams ::= SEQUENCE {
+   hashAlgorithm           OBJECT IDENTIFIER DEFAULT (SHA512)
+   componentKeyParams      SEQUENCE SIZE (2..kofn-CompositeThresholdMax) OF kofn-CompositeComponentKeyParams,
+   threshold               kofn-CompositeThreshold OPTIONAL,
+}
+
+pk-kofn-CompositePublicKey PUBLIC-KEY ::= {
+   id id-kofn-CompositeCrypto
+   KeyValue pk-kofn-CompositePublicKey
+   Params TYPE kofn-CompositeKeyParams ARE required
+   PrivateKey kofn-CompositePrivateKey
+}
+
+--
+-- Signature Algorithm
+--
+
+sa-kofn-CompositeSignature SIGNATURE-ALGORITHM ::= {
+      IDENTIFIER id-kofn-CompositeCrypto
+      VALUE kofn-CompositeSignatureValue
+      PARAMS ARE absent
+      PUBLIC-KEYS { pk-kofn-CompositePublicKey }
+      SMIME-CAPS { IDENTIFIED BY id-kofn-CompositeCrypto }
+}
+
+kofn-CompositeSignatureValue ::= SEQUENCE SIZE (2..kofn-CompositeThresholdMax) OF BIT STRING
 
 END
-
-<CODE ENDS>
 
 ~~~
 
