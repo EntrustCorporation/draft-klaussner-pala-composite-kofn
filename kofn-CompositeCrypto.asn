@@ -37,16 +37,22 @@ der OBJECT IDENTIFIER ::=
   {joint-iso-itu-t asn1(1) ber-derived(2) distinguished-encoding(1)}
 
 id-kofn-CompositeCrypto OBJECT IDENTIFIER ::= {
-   iso(1) identified-organization(3) dod(6)
-   internet(1) private(4) enterprise(1) OpenCA(18227)
-   Algorithms(2) PublicKey(1) Experimental(999)
-   kofn-CompositeCrypto(2)
+  iso(1) identified-organization(3) dod(6)
+  internet(1) private(4) enterprise(1) OpenCA(18227)
+  Algorithms(2) PublicKey(1) Experimental(999)
+  kofn-CompositeCrypto(2)
 }
 
-id-ce-deprecatedAlgsList OBJECT IDENTIFIER ::= { 
-   iso(1) identified-organization(3) dod(6) 
-   internet(1) private(4) enterprise(1) OpenCA(18227)
-   Extensions(3) deprecated-algs (2)
+id-ce-deprecatedKeyTypes OBJECT IDENTIFIER ::= { 
+  iso(1) identified-organization(3) dod(6) 
+  internet(1) private(4) enterprise(1) OpenCA(18227)
+  Extensions(3) deprecated-algs (2) 
+}
+
+id-ce-requiredKeyTypes OBJECT IDENTIFIER ::= { 
+  iso(1) identified-organization(3) dod(6) 
+  internet(1) private(4) enterprise(1) OpenCA(18227)
+  Extensions(3) required-algs (3)
 }
 
 --
@@ -113,5 +119,15 @@ sa-kofn-CompositeSignature SIGNATURE-ALGORITHM ::= {
       PUBLIC-KEYS { pk-kofn-CompositePublicKey }
       SMIME-CAPS { IDENTIFIED BY id-kofn-CompositeCrypto }
 }
+
+--
+-- Extensions
+--
+
+DeprecatedKeyTypes ::= SEQUENCE SIZE (1..MaxThreshold) 
+      OF OBJECT IDENTIFIER
+
+RequiredKeyTypes ::= SEQUENCE SIZE (1..MaxThreshold) 
+      OF OBJECT IDENTIFIER
 
 END

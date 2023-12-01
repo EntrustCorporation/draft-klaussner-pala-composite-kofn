@@ -790,9 +790,9 @@ TBD.
 
 ~~~ ASN.1
 
-   kofn-Composite-Crypto-2023
-     { joint-iso-itu-t(2) country(16) us(840) organization(1) OpenCA(18277) 
-       Algorithms(2) PublicKey(1) kofn-CompositeCrypto(2) }
+kofn-Composite-Crypto-2023
+  { joint-iso-itu-t(2) country(16) us(840) organization(1) OpenCA(18277) 
+    Algorithms(2) PublicKey(1) kofn-CompositeCrypto(2) }
 
 DEFINITIONS IMPLICIT TAGS ::= BEGIN
 
@@ -828,55 +828,65 @@ der OBJECT IDENTIFIER ::=
   {joint-iso-itu-t asn1(1) ber-derived(2) distinguished-encoding(1)}
 
 id-kofn-CompositeCrypto OBJECT IDENTIFIER ::= {
-   iso(1) identified-organization(3) dod(6)
-   internet(1) private(4) enterprise(1) OpenCA(18227)
-   Algorithms(2) PublicKey(1) Experimental(999)
-   kofn-CompositeCrypto(2)
+  iso(1) identified-organization(3) dod(6)
+  internet(1) private(4) enterprise(1) OpenCA(18227)
+  Algorithms(2) PublicKey(1) Experimental(999)
+  kofn-CompositeCrypto(2)
 }
 
-id-ce-deprecatedAlgsList OBJECT IDENTIFIER ::= { 
-   iso(1) identified-organization(3) dod(6) 
-   internet(1) private(4) enterprise(1) OpenCA(18227)
-   Extensions(3) deprecated-algs (2)
+id-ce-deprecatedKeyTypes OBJECT IDENTIFIER ::= { 
+  iso(1) identified-organization(3) dod(6) 
+  internet(1) private(4) enterprise(1) OpenCA(18227)
+  Extensions(3) deprecated-algs (2) 
+}
+
+id-ce-requiredKeyTypes OBJECT IDENTIFIER ::= { 
+  iso(1) identified-organization(3) dod(6) 
+  internet(1) private(4) enterprise(1) OpenCA(18227)
+  Extensions(3) required-algs (3)
 }
 
 --
 -- Constants
 --
 
-kofn-CompositeComponentsMax INTEGER ::= 16
+MaxComponents INTEGER ::= 16
       -- Maximum number of allowed components in a Key
 
-kofn-CompositeThresholdMax INTEGER ::= 15
+MaxThreshold INTEGER ::= 15
       -- Maximum value for required algoritmic threshold
+
+CompositeThreshold ::= INTEGER (1..MaxThreshold)
+      -- Allowed value ranges for the K-of-N threshold (K)
 
 --
 -- Private Keys
 --
 
-kofn-CompositePrivateKey ::= SEQUENCE SIZE (2..kofn-CompositeComponentsMax) OF OneAsymmetricKey
+kofn-CompositePrivateKey ::= SEQUENCE SIZE (2..MaxComponents)
+  OF OneAsymmetricKey
+
+kofn-CompositeParams ::= SEQUECE {
+  hashAlgorithm           AlgorithmIdentifier,
+    -- Identifier for the hash algorithm used to pre-hash the message
+  threshold               CompositeThreshold OPTIONAL,
+    -- Number of required supported algorithms (must be less than N)
+}
 
 --
 -- Public Keys
 --
 
-kofn-CompositeThreshold ::= INTEGER (1..kofn-CompositeThresholdMax)
-
-kofn-CompositeComponentKeyParams ::= SEQUENCE {
-   componentAlgorithm      algorithmIdentifier,
-   isRequired              BOOLEAN DEFAULT TRUE OPTIONAL,
-}
-
-kofn-CompositeKeyParams ::= SEQUENCE {
-   hashAlgorithm           OBJECT IDENTIFIER DEFAULT (SHA512)
-   componentKeyParams      SEQUENCE SIZE (2..kofn-CompositeThresholdMax) OF kofn-CompositeComponentKeyParams,
-   threshold               kofn-CompositeThreshold OPTIONAL,
+kofn-CompositePublicKeyParams ::= SEQUENCE {
+  params                  kofn-CompositeParams,
+  componentsParams        SEQUENCE SIZE (1..MaxComponents)
+      OF AlgorithmIdentifier,
 }
 
 pk-kofn-CompositePublicKey PUBLIC-KEY ::= {
    id id-kofn-CompositeCrypto
    KeyValue pk-kofn-CompositePublicKey
-   Params TYPE kofn-CompositeKeyParams ARE required
+   Params TYPE kofn-CompositePublicKeyParams ARE required
    PrivateKey kofn-CompositePrivateKey
 }
 
@@ -884,15 +894,32 @@ pk-kofn-CompositePublicKey PUBLIC-KEY ::= {
 -- Signature Algorithm
 --
 
+kofn-CompositeSignatureParams ::= SEQUENCE {
+  componentsParams    SEQUENCE SIZE 
+      (1..MaxComponents) OF AlgorithmIdentifier,
+  hashAlgorithm   OBJECT IDENTIFIER OPTIONAL,
+}
+
+kofn-CompositeComponentSignatureValue ::= SEQUENCE 
+    SIZE (1..MaxComponents) OF BIT STRING
+ 
 sa-kofn-CompositeSignature SIGNATURE-ALGORITHM ::= {
       IDENTIFIER id-kofn-CompositeCrypto
       VALUE kofn-CompositeSignatureValue
-      PARAMS ARE absent
+      PARAMS TYPE kofn-CompositeSignatureParams ARE optional
       PUBLIC-KEYS { pk-kofn-CompositePublicKey }
       SMIME-CAPS { IDENTIFIED BY id-kofn-CompositeCrypto }
 }
 
-kofn-CompositeSignatureValue ::= SEQUENCE SIZE (2..kofn-CompositeThresholdMax) OF BIT STRING
+--
+-- Extensions
+--
+
+DeprecatedKeyTypes ::= SEQUENCE SIZE (1..MaxThreshold) 
+      OF OBJECT IDENTIFIER
+
+RequiredKeyTypes ::= SEQUENCE SIZE (1..MaxThreshold) 
+      OF OBJECT IDENTIFIER
 
 END
 
