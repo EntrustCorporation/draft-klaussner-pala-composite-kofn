@@ -416,14 +416,14 @@ The `kofn-CompositeSignatureParams` and `sa-kofn-CompositeSignature` structures 
 
 ~~~ ASN.1
 kofn-CompositeSignatureParams ::= SEQUENCE {
-  hashAlgorithm    OBJECT IDENTIFIER OPTIONAL,
-  componentsParams SEQUENCE SIZE (1..MaxComponents)
-      OF AlgorithmIdentifier,
+  componentsParams    SEQUENCE SIZE 
+      (1..MaxComponents) OF AlgorithmIdentifier,
+  hashAlgorithm   OBJECT IDENTIFIER OPTIONAL,
 }
 
-kofn-CompositeSignatureValue ::= SEQUENCE SIZE (2..MaxThreshold) 
-  OF BIT STRING
-  
+kofn-CompositeComponentSignatureValue ::= SEQUENCE 
+    SIZE (1..MaxComponents) OF BIT STRING
+ 
 sa-kofn-CompositeSignature SIGNATURE-ALGORITHM ::= {
       IDENTIFIER id-kofn-CompositeCrypto
       VALUE kofn-CompositeSignatureValue

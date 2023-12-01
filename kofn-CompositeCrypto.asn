@@ -98,17 +98,14 @@ pk-kofn-CompositePublicKey PUBLIC-KEY ::= {
 --
 
 kofn-CompositeSignatureParams ::= SEQUENCE {
+  componentsParams    SEQUENCE SIZE 
+      (1..MaxComponents) OF AlgorithmIdentifier,
   hashAlgorithm   OBJECT IDENTIFIER OPTIONAL,
 }
 
-kofn-CompositeComponentSignatureValue ::= SEQUENCE {
-  algorithm     AlgorithmIdentifier,
-  value         BIT STRING
-}
-
-kofn-CompositeSignatureValue ::= SEQUENCE SIZE (2..MaxThreshold) 
-  OF kofn-CompositeComponentSignatureValue
-  
+kofn-CompositeComponentSignatureValue ::= SEQUENCE 
+    SIZE (1..MaxComponents) OF BIT STRING
+ 
 sa-kofn-CompositeSignature SIGNATURE-ALGORITHM ::= {
       IDENTIFIER id-kofn-CompositeCrypto
       VALUE kofn-CompositeSignatureValue
