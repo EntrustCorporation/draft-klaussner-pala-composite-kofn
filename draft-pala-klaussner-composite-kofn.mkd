@@ -784,6 +784,21 @@ No IANA actions are required by this document.
 
 TBD.
 
+# Contributors and Acknowledgements
+
+This document incorporates contributions and comments from a large group of experts. The Editors would especially like to acknowledge the expertise and tireless dedication of the following people, who attended many long meetings and generated millions of bytes of electronic mail and VOIP traffic over the past year in pursuit of this document:
+
+Serge Mister (Entrust),
+Scott Fluhrer (Cisco Systems),
+Klaus-Dieter Wirth (D-Trust), and
+François Rousseau.
+
+We are grateful to all, including any contributors who may have
+been inadvertently omitted from this list.
+
+This document borrows text from similar documents, including those referenced below. Thanks go to the authors of those
+   documents.  "Copying always makes things easier and less error prone" - {{!RFC8411}}.
+
 --- back
 
 # ASN.1 Module
@@ -930,23 +945,7 @@ END
 
 The following IPR Disclosure relates to this draft:
 
-https://datatracker.ietf.org/ipr/3588/
-
-
-
-# Contributors and Acknowledgements
-This document incorporates contributions and comments from a large group of experts. The Editors would especially like to acknowledge the expertise and tireless dedication of the following people, who attended many long meetings and generated millions of bytes of electronic mail and VOIP traffic over the past year in pursuit of this document:
-
-Serge Mister (Entrust),
-Scott Fluhrer (Cisco Systems),
-Klaus-Dieter Wirth (D-Trust), and
-François Rousseau.
-
-We are grateful to all, including any contributors who may have
-been inadvertently omitted from this list.
-
-This document borrows text from similar documents, including those referenced below. Thanks go to the authors of those
-   documents.  "Copying always makes things easier and less error prone" - {{!RFC8411}}.
+* <https://datatracker.ietf.org/ipr/3588/>
 
 ## Making contributions
 

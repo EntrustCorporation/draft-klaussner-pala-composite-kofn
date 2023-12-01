@@ -103,9 +103,9 @@ Table of Contents
      6.3.  The RequiredKeyTypes extension  . . . . . . . . . . . . .  17
    7.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  17
    8.  Security Considerations . . . . . . . . . . . . . . . . . . .  17
-   9.  References  . . . . . . . . . . . . . . . . . . . . . . . . .  17
-     9.1.  Normative References  . . . . . . . . . . . . . . . . . .  17
-     9.2.  Informative References  . . . . . . . . . . . . . . . . .  19
+   9.  Contributors and Acknowledgements . . . . . . . . . . . . . .  17
+   10. References  . . . . . . . . . . . . . . . . . . . . . . . . .  18
+     10.1.  Normative References . . . . . . . . . . . . . . . . . .  18
 
 
 
@@ -114,11 +114,11 @@ Pala, et al.               Expires 3 June 2024                  [Page 2]
 Internet-Draft         k-of-n Composite Signatures         December 2023
 
 
+     10.2.  Informative References . . . . . . . . . . . . . . . . .  19
    Appendix A.  ASN.1 Module . . . . . . . . . . . . . . . . . . . .  19
-   Appendix B.  Intellectual Property Considerations . . . . . . . .  21
-   Appendix C.  Contributors and Acknowledgements  . . . . . . . . .  21
-     C.1.  Making contributions  . . . . . . . . . . . . . . . . . .  22
-   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  22
+   Appendix B.  Intellectual Property Considerations . . . . . . . .  22
+     B.1.  Making contributions  . . . . . . . . . . . . . . . . . .  22
+   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  23
 
 1.  Terminology
 
@@ -934,17 +934,17 @@ Internet-Draft         k-of-n Composite Signatures         December 2023
 
    TBD.
 
-9.  References
+9.  Contributors and Acknowledgements
 
-9.1.  Normative References
+   This document incorporates contributions and comments from a large
+   group of experts.  The Editors would especially like to acknowledge
+   the expertise and tireless dedication of the following people, who
+   attended many long meetings and generated millions of bytes of
+   electronic mail and VOIP traffic over the past year in pursuit of
+   this document:
 
-   [I-D.ounsworth-pq-composite-keys]
-              Ounsworth, M., Gray, J., Pala, M., and J. Klaußner,
-              "Composite Public and Private Keys For Use In Internet
-              PKI", Work in Progress, Internet-Draft, draft-ounsworth-
-              pq-composite-keys-05, 29 May 2023,
-              <https://datatracker.ietf.org/doc/html/draft-ounsworth-pq-
-              composite-keys-05>.
+   Serge Mister (Entrust), Scott Fluhrer (Cisco Systems), Klaus-Dieter
+   Wirth (D-Trust), and Francois Rousseau.
 
 
 
@@ -953,6 +953,26 @@ Pala, et al.               Expires 3 June 2024                 [Page 17]
 
 Internet-Draft         k-of-n Composite Signatures         December 2023
 
+
+   We are grateful to all, including any contributors who may have been
+   inadvertently omitted from this list.
+
+   This document borrows text from similar documents, including those
+   referenced below.  Thanks go to the authors of those documents.
+   "Copying always makes things easier and less error prone" -
+   [RFC8411].
+
+10.  References
+
+10.1.  Normative References
+
+   [I-D.ounsworth-pq-composite-keys]
+              Ounsworth, M., Gray, J., Pala, M., and J. Klaußner,
+              "Composite Public and Private Keys For Use In Internet
+              PKI", Work in Progress, Internet-Draft, draft-ounsworth-
+              pq-composite-keys-05, 29 May 2023,
+              <https://datatracker.ietf.org/doc/html/draft-ounsworth-pq-
+              composite-keys-05>.
 
    [I-D.ounsworth-pq-composite-sigs]
               Ounsworth, M., Gray, J., Pala, M., and J. Klaußner,
@@ -977,6 +997,18 @@ Internet-Draft         k-of-n Composite Signatures         December 2023
               Certificate Request Message Format (CRMF)", RFC 4211,
               DOI 10.17487/RFC4211, September 2005,
               <https://www.rfc-editor.org/info/rfc4211>.
+
+
+
+
+
+
+
+
+Pala, et al.               Expires 3 June 2024                 [Page 18]
+
+Internet-Draft         k-of-n Composite Signatures         December 2023
+
 
    [RFC5280]  Cooper, D., Santesson, S., Farrell, S., Boeyen, S.,
               Housley, R., and W. Polk, "Internet X.509 Public Key
@@ -1003,13 +1035,6 @@ Internet-Draft         k-of-n Composite Signatures         December 2023
               2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
               May 2017, <https://www.rfc-editor.org/info/rfc8174>.
 
-
-
-Pala, et al.               Expires 3 June 2024                 [Page 18]
-
-Internet-Draft         k-of-n Composite Signatures         December 2023
-
-
    [RFC8411]  Schaad, J. and R. Andrews, "IANA Registration for the
               Cryptographic Algorithm Object Identifier Range",
               RFC 8411, DOI 10.17487/RFC8411, August 2018,
@@ -1020,7 +1045,7 @@ Internet-Draft         k-of-n Composite Signatures         December 2023
               Encoding Rules (CER) and Distinguished Encoding Rules
               (DER)", ISO/IEC 8825-1:2015, November 2015.
 
-9.2.  Informative References
+10.2.  Informative References
 
    [I-D.driscoll-pqt-hybrid-terminology]
               D, F., "Terminology for Post-Quantum Traditional Hybrid
@@ -1031,9 +1056,19 @@ Internet-Draft         k-of-n Composite Signatures         December 2023
 
 Appendix A.  ASN.1 Module
 
-      kofn-Composite-Crypto-2023
-        { joint-iso-itu-t(2) country(16) us(840) organization(1) OpenCA(18277)
-          Algorithms(2) PublicKey(1) kofn-CompositeCrypto(2) }
+
+
+
+
+
+Pala, et al.               Expires 3 June 2024                 [Page 19]
+
+Internet-Draft         k-of-n Composite Signatures         December 2023
+
+
+   kofn-Composite-Crypto-2023
+     { joint-iso-itu-t(2) country(16) us(840) organization(1) OpenCA(18277)
+       Algorithms(2) PublicKey(1) kofn-CompositeCrypto(2) }
 
    DEFINITIONS IMPLICIT TAGS ::= BEGIN
 
@@ -1058,14 +1093,6 @@ Appendix A.  ASN.1 Module
            pkcs-9(9) smime(16) modules(0)
            id-mod-asymmetricKeyPkgV1(50) }
 
-
-
-
-Pala, et al.               Expires 3 June 2024                 [Page 19]
-
-Internet-Draft         k-of-n Composite Signatures         December 2023
-
-
    ;
 
    --
@@ -1077,43 +1104,16 @@ Internet-Draft         k-of-n Composite Signatures         December 2023
      {joint-iso-itu-t asn1(1) ber-derived(2) distinguished-encoding(1)}
 
    id-kofn-CompositeCrypto OBJECT IDENTIFIER ::= {
-      iso(1) identified-organization(3) dod(6)
-      internet(1) private(4) enterprise(1) OpenCA(18227)
-      Algorithms(2) PublicKey(1) Experimental(999)
-      kofn-CompositeCrypto(2)
+     iso(1) identified-organization(3) dod(6)
+     internet(1) private(4) enterprise(1) OpenCA(18227)
+     Algorithms(2) PublicKey(1) Experimental(999)
+     kofn-CompositeCrypto(2)
    }
 
-   id-ce-deprecatedAlgsList OBJECT IDENTIFIER ::= {
-      iso(1) identified-organization(3) dod(6)
-      internet(1) private(4) enterprise(1) OpenCA(18227)
-      Extensions(3) deprecated-algs (2)
-   }
-
-   --
-   -- Constants
-   --
-
-   kofn-CompositeComponentsMax INTEGER ::= 16
-         -- Maximum number of allowed components in a Key
-
-   kofn-CompositeThresholdMax INTEGER ::= 15
-         -- Maximum value for required algoritmic threshold
-
-   --
-   -- Private Keys
-   --
-
-   kofn-CompositePrivateKey ::= SEQUENCE SIZE (2..kofn-CompositeComponentsMax) OF OneAsymmetricKey
-
-   --
-   -- Public Keys
-   --
-
-   kofn-CompositeThreshold ::= INTEGER (1..kofn-CompositeThresholdMax)
-
-   kofn-CompositeComponentKeyParams ::= SEQUENCE {
-      componentAlgorithm      algorithmIdentifier,
-      isRequired              BOOLEAN DEFAULT TRUE OPTIONAL,
+   id-ce-deprecatedKeyTypes OBJECT IDENTIFIER ::= {
+     iso(1) identified-organization(3) dod(6)
+     internet(1) private(4) enterprise(1) OpenCA(18227)
+     Extensions(3) deprecated-algs (2)
 
 
 
@@ -1124,52 +1124,52 @@ Internet-Draft         k-of-n Composite Signatures         December 2023
 
    }
 
-   kofn-CompositeKeyParams ::= SEQUENCE {
-      hashAlgorithm           OBJECT IDENTIFIER DEFAULT (SHA512)
-      componentKeyParams      SEQUENCE SIZE (2..kofn-CompositeThresholdMax) OF kofn-CompositeComponentKeyParams,
-      threshold               kofn-CompositeThreshold OPTIONAL,
+   id-ce-requiredKeyTypes OBJECT IDENTIFIER ::= {
+     iso(1) identified-organization(3) dod(6)
+     internet(1) private(4) enterprise(1) OpenCA(18227)
+     Extensions(3) required-algs (3)
+   }
+
+   --
+   -- Constants
+   --
+
+   MaxComponents INTEGER ::= 16
+         -- Maximum number of allowed components in a Key
+
+   MaxThreshold INTEGER ::= 15
+         -- Maximum value for required algoritmic threshold
+
+   CompositeThreshold ::= INTEGER (1..MaxThreshold)
+         -- Allowed value ranges for the K-of-N threshold (K)
+
+   --
+   -- Private Keys
+   --
+
+   kofn-CompositePrivateKey ::= SEQUENCE SIZE (2..MaxComponents)
+     OF OneAsymmetricKey
+
+   kofn-CompositeParams ::= SEQUECE {
+     hashAlgorithm           AlgorithmIdentifier,
+       -- Identifier for the hash algorithm used to pre-hash the message
+     threshold               CompositeThreshold OPTIONAL,
+       -- Number of required supported algorithms (must be less than N)
+   }
+
+   --
+   -- Public Keys
+   --
+
+   kofn-CompositePublicKeyParams ::= SEQUENCE {
+     params                  kofn-CompositeParams,
+     componentsParams        SEQUENCE SIZE (1..MaxComponents)
+         OF AlgorithmIdentifier,
    }
 
    pk-kofn-CompositePublicKey PUBLIC-KEY ::= {
       id id-kofn-CompositeCrypto
       KeyValue pk-kofn-CompositePublicKey
-      Params TYPE kofn-CompositeKeyParams ARE required
-      PrivateKey kofn-CompositePrivateKey
-   }
-
-   --
-   -- Signature Algorithm
-   --
-
-   sa-kofn-CompositeSignature SIGNATURE-ALGORITHM ::= {
-         IDENTIFIER id-kofn-CompositeCrypto
-         VALUE kofn-CompositeSignatureValue
-         PARAMS ARE absent
-         PUBLIC-KEYS { pk-kofn-CompositePublicKey }
-         SMIME-CAPS { IDENTIFIED BY id-kofn-CompositeCrypto }
-   }
-
-   kofn-CompositeSignatureValue ::= SEQUENCE SIZE (2..kofn-CompositeThresholdMax) OF BIT STRING
-
-   END
-
-Appendix B.  Intellectual Property Considerations
-
-   The following IPR Disclosure relates to this draft:
-
-   https://datatracker.ietf.org/ipr/3588/
-
-Appendix C.  Contributors and Acknowledgements
-
-   This document incorporates contributions and comments from a large
-   group of experts.  The Editors would especially like to acknowledge
-   the expertise and tireless dedication of the following people, who
-   attended many long meetings and generated millions of bytes of
-   electronic mail and VOIP traffic over the past year in pursuit of
-   this document:
-
-   Serge Mister (Entrust), Scott Fluhrer (Cisco Systems), Klaus-Dieter
-   Wirth (D-Trust), and Francois Rousseau.
 
 
 
@@ -1178,18 +1178,61 @@ Pala, et al.               Expires 3 June 2024                 [Page 21]
 Internet-Draft         k-of-n Composite Signatures         December 2023
 
 
-   We are grateful to all, including any contributors who may have been
-   inadvertently omitted from this list.
+      Params TYPE kofn-CompositePublicKeyParams ARE required
+      PrivateKey kofn-CompositePrivateKey
+   }
 
-   This document borrows text from similar documents, including those
-   referenced below.  Thanks go to the authors of those documents.
-   "Copying always makes things easier and less error prone" -
-   [RFC8411].
+   --
+   -- Signature Algorithm
+   --
 
-C.1.  Making contributions
+   kofn-CompositeSignatureParams ::= SEQUENCE {
+     componentsParams    SEQUENCE SIZE
+         (1..MaxComponents) OF AlgorithmIdentifier,
+     hashAlgorithm   OBJECT IDENTIFIER OPTIONAL,
+   }
+
+   kofn-CompositeComponentSignatureValue ::= SEQUENCE
+       SIZE (1..MaxComponents) OF BIT STRING
+
+   sa-kofn-CompositeSignature SIGNATURE-ALGORITHM ::= {
+         IDENTIFIER id-kofn-CompositeCrypto
+         VALUE kofn-CompositeSignatureValue
+         PARAMS TYPE kofn-CompositeSignatureParams ARE optional
+         PUBLIC-KEYS { pk-kofn-CompositePublicKey }
+         SMIME-CAPS { IDENTIFIED BY id-kofn-CompositeCrypto }
+   }
+
+   --
+   -- Extensions
+   --
+
+   DeprecatedKeyTypes ::= SEQUENCE SIZE (1..MaxThreshold)
+         OF OBJECT IDENTIFIER
+
+   RequiredKeyTypes ::= SEQUENCE SIZE (1..MaxThreshold)
+         OF OBJECT IDENTIFIER
+
+   END
+
+Appendix B.  Intellectual Property Considerations
+
+   The following IPR Disclosure relates to this draft:
+
+   *  https://datatracker.ietf.org/ipr/3588/
+      (https://datatracker.ietf.org/ipr/3588/)
+
+B.1.  Making contributions
 
    Additional contributions to this draft are welcome.  Please see the
    working copy of this draft at, as well as open issues at:
+
+
+
+Pala, et al.               Expires 3 June 2024                 [Page 22]
+
+Internet-Draft         k-of-n Composite Signatures         December 2023
+
 
    https://github.com/EntrustCorporation/draft-klaussner-pala-composite-
    kofn (https://github.com/EntrustCorporation/draft-klaussner-pala-
@@ -1224,16 +1267,6 @@ Authors' Addresses
    Email: <mike.ounsworth@entrust.com>
 
 
-
-
-
-
-
-Pala, et al.               Expires 3 June 2024                 [Page 22]
-
-Internet-Draft         k-of-n Composite Signatures         December 2023
-
-
    John Gray
    Entrust Limited
    2500 Solandt Road -- Suite 100
@@ -1241,39 +1274,6 @@ Internet-Draft         k-of-n Composite Signatures         December 2023
    Canada
 
    Email: <john.gray@entrust.com>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
