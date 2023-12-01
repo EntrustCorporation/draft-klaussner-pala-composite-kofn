@@ -704,9 +704,11 @@ re-provisioned (or replaced) and can continue to operate by relying on the
 non-deprecated algorithm.
 
 The list of deprecated algorithms that are to be considered automatic
-validation "failures" can be directly configured as a parameter in the
+validation "unknowns" can be directly configured as a parameter in the
 validating entity's process, or by accessing a trusted source of
 information.
+
+## The `DeprecatedKeyTypes` extension {#deprecated_key_types}
 
 In an ecosystem such as the Internet PKI or IoT PKIs, since algorithm
 deprecation can be seen as another form of (mass) revocation, a convenient
@@ -714,73 +716,75 @@ mechanism to distribute the list of deprecated algorithms by adding a
 specific extension to Certificate Revocation Lists {{!RFC5280}} or Online
 Certificate Status Protocol {{!RFC6960}} responses.
 
-We define a new `deprecated-algorithms` extension together with the
-associated `id-ext-deprecated-algorithms` identifier. The data structure
-of the extension is defined as a `SEQUENCE` of `DeprecatedAlgorithm`.
-Each `DeprecatedAlgorithm` is defined as an `OBJECT IDENTIFIER`.
+We define a new `DeprecatedKeyTypes` extension together with the
+associated `id-ce-deprecatedKeyTypes` identifier. The data structure
+of the extension is defined as a `SEQUENCE` of `OBJECT IDENTIFIER`. The
+corresponding ASN.1 structures are defined as follows:
 
-We define the following identifier:
-
-~~~asn.1
-id-ce-deprecatedAlgsList OBJECT IDENTIFIER ::= { 
+~~~ ASN.1
+id-ce-deprecatedKeyTypes OBJECT IDENTIFIER ::= { 
       iso(1) identified-organization(3) dod(6) 
       internet(1) private(4) enterprise(1) OpenCA(18227)
       Extensions(3) deprecated-algs (2) }
+
+DeprecatedKeyTypes ::= SEQUENCE SIZE (1..MaxThreshold) 
+      OF OBJECT IDENTIFIER
 ~~~
 
+When this extension is present in a CRL or OCSP response, the validating
+party MUST consider the algorithms listed in the extension as "unknown",
+even in the case where the algorithm is supported by the device. At a
+practical level, this means that the validation of a component signature
+that carries a deprecated algorithm identifier MUST fail if the threshold
+(or K-of-N) validations is not met because of the deprecation of algorithms.
+
+For example, let's imagine a K-of-N Composite key that combines AlgorithmA
+and AlgorithmB together. Let's also imagine that a device can only validate
+AlgorithmA and does not have support for AlgorithmB. If the K-of-N threshold
+is set to `1`, then the device can still validate the composite signature
+since it can still rely on AlgorithmA. However, if AlgorithmA is deprecated
+via the `DeprecatedKeyTypes` extension, then the validation MUST fail
+because the device can no longer rely on AlgorithmA.
+
+## The `RequiredKeyTypes` extension {#required_key_types}
+
+When backward or forward compatibility is required, it might be useful to
+provide the possibility to pin specific algorithms to be required to be
+supported during signature and validations processes.
+
+For example, when a K-of-N is used with `N = 3` and `K =2`, there migth be
+requirements to make sure that one of the two required algorithms to be
+validated is a specific one (e.g., AlgorithmA).
+
+To handle this situation, we define a new `RequiredKeyTypes` extension,
+together with the associated `id-ce-requiredKeyTypes` identifier, that can
+be added to Certificate Revocation Lists {{!RFC5280}}, Online Certificate Status
+Protocol {{!RFC6960}} responses.
+
+We define a new `RequiredKeyTypes` extension together with the
+associated `id-ce-requiredKeyTypes` identifier. The data structure
+of the extension is defined as a `SEQUENCE` of `OBJECT IDENTIFIER`. The
+corresponding ASN.1 structures are defined as follows:
+
+~~~ ASN.1
+id-ce-requiredKeyTypes OBJECT IDENTIFIER ::= { 
+      iso(1) identified-organization(3) dod(6) 
+      internet(1) private(4) enterprise(1) OpenCA(18227)
+      Extensions(3) required-algs (3) }
+
+RequiredKeyTypes ::= SEQUENCE SIZE (1..MaxThreshold) 
+      OF OBJECT IDENTIFIER
+~~~
 
 # IANA Considerations {#sec-iana}
 
-This document registers the following in the SMI "Security for PKIX Algorithms (1.3.6.1.5.5.7.6)" registry:
-
-~~~ ASN.1
-id-kofn-CompositeCrypto OBJECT IDENTIFIER ::= {
-    iso(1) identified-organization(3) dod(6) internet(1) security(5)
-    mechanisms(5) pkix(7) algorithms(6) id-multikey-key(??) }
-~~~
-
-This document registers the following in the SMI " " registry:
-
-~~~ ASN.1
-id-ce-deprecatedAlgsList OBJECT IDENTIFIER ::= { id-ce deprecatedAlgsList(??) }
-~~~
+No IANA actions are required by this document.
 
 # Security Considerations {#security-considerations}
 
+TBD.
 
-<!-- End of Security Considerations section -->
-
-<!-- Start of Appendices -->
 --- back
-
-# Explicit Algorithm Identifiers {#explicit-algorithms}
-
-This variant provides a rigid way of specifying supported
-combinations of algorithms.
-
-Although this variant limits the possibility for combining
-non-standard algorithms (or algorithms not considered by the
-authors of this document), the use of identifiers that identify
-pairs of standard algorithms might be easier in certain
-situations such as referencing and/or enforcing specific
-combinations of algorithms without the need for developing
-additional validation procedures external to the signature
-validation one.
-
-Explicit algorithms must define a new signature algorithm which
-consists of:
-
-*  A new algorithm identifier OID for the explicit algorithm.
-*  The algorithm identifier OID and PUBLIC-KEY type of each component
-   algorithm.
-*  Signature parameters either declared ABSENT, or defined with a
-   type and encoding.
-
-The definition of the explicit algorithm identifiers follows
-the same definitions provided in Section 4.2 of {{-composite_keys}}
-with the exception of the parameters that are not ABSENT but
-OPTIONAL and their TYPE is MultiKey-params as defined in {{sec_kofn_pub_keys}}.
-
 
 # ASN.1 Module
 

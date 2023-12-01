@@ -5,11 +5,11 @@
 LAMPS                                                            M. Pala
 Internet-Draft                                                 CableLabs
 Intended status: Standards Track                            J. Klaussner
-Expires: 1 June 2024                                        D-Trust GmbH
+Expires: 3 June 2024                                        D-Trust GmbH
                                                             M. Ounsworth
                                                                  J. Gray
                                                                  Entrust
-                                                        29 November 2023
+                                                         1 December 2023
 
 
           k-of-n Composite Signatures for Multi-Algorithm PKI
@@ -53,9 +53,9 @@ Status of This Memo
 
 
 
-Pala, et al.               Expires 1 June 2024                  [Page 1]
+Pala, et al.               Expires 3 June 2024                  [Page 1]
 
-Internet-Draft         k-of-n Composite Signatures         November 2023
+Internet-Draft         k-of-n Composite Signatures         December 2023
 
 
    Internet-Drafts are draft documents valid for a maximum of six months
@@ -63,7 +63,7 @@ Internet-Draft         k-of-n Composite Signatures         November 2023
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 1 June 2024.
+   This Internet-Draft will expire on 3 June 2024.
 
 Copyright Notice
 
@@ -88,7 +88,7 @@ Table of Contents
            Composite . . . . . . . . . . . . . . . . . . . . . . . .   5
    3.  K-of-N Composite Keys . . . . . . . . . . . . . . . . . . . .   6
      3.1.  K-of-N Composite Key Generation . . . . . . . . . . . . .   6
-     3.2.  K-of-N Composite Private Keys . . . . . . . . . . . . . .   7
+     3.2.  K-of-N Composite Private Keys . . . . . . . . . . . . . .   6
        3.2.1.  K-of-N Private Key storage considerations . . . . . .   8
      3.3.  K-of-N Composite Public Keys  . . . . . . . . . . . . . .   8
    4.  K-of-N Composite Signatures . . . . . . . . . . . . . . . . .   8
@@ -99,24 +99,25 @@ Table of Contents
    6.  Deprecating Algorithms and Impact over signature
            validations . . . . . . . . . . . . . . . . . . . . . . .  15
      6.1.  Distributing the list of deprecated algorithms  . . . . .  15
-   7.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  16
-   8.  Security Considerations . . . . . . . . . . . . . . . . . . .  16
-   9.  References  . . . . . . . . . . . . . . . . . . . . . . . . .  16
-     9.1.  Normative References  . . . . . . . . . . . . . . . . . .  16
-     9.2.  Informative References  . . . . . . . . . . . . . . . . .  18
-   Appendix A.  Explicit Algorithm Identifiers . . . . . . . . . . .  18
-   Appendix B.  ASN.1 Module . . . . . . . . . . . . . . . . . . . .  19
+     6.2.  The DeprecatedKeyTypes extension  . . . . . . . . . . . .  16
+     6.3.  The RequiredKeyTypes extension  . . . . . . . . . . . . .  17
+   7.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  17
+   8.  Security Considerations . . . . . . . . . . . . . . . . . . .  17
+   9.  References  . . . . . . . . . . . . . . . . . . . . . . . . .  17
+     9.1.  Normative References  . . . . . . . . . . . . . . . . . .  17
+     9.2.  Informative References  . . . . . . . . . . . . . . . . .  19
 
 
 
-Pala, et al.               Expires 1 June 2024                  [Page 2]
+Pala, et al.               Expires 3 June 2024                  [Page 2]
 
-Internet-Draft         k-of-n Composite Signatures         November 2023
+Internet-Draft         k-of-n Composite Signatures         December 2023
 
 
-   Appendix C.  Intellectual Property Considerations . . . . . . . .  21
-   Appendix D.  Contributors and Acknowledgements  . . . . . . . . .  21
-     D.1.  Making contributions  . . . . . . . . . . . . . . . . . .  22
+   Appendix A.  ASN.1 Module . . . . . . . . . . . . . . . . . . . .  19
+   Appendix B.  Intellectual Property Considerations . . . . . . . .  21
+   Appendix C.  Contributors and Acknowledgements  . . . . . . . . .  21
+     C.1.  Making contributions  . . . . . . . . . . . . . . . . . .  22
    Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  22
 
 1.  Terminology
@@ -160,15 +161,17 @@ Internet-Draft         k-of-n Composite Signatures         November 2023
    to be resistant to classical and quantum cryptanalysis, such as the
    algorithms being considered for standardization by NIST.
 
+
+
+
+
+Pala, et al.               Expires 3 June 2024                  [Page 3]
+
+Internet-Draft         k-of-n Composite Signatures         December 2023
+
+
    PUBLIC / PRIVATE KEY: The public and private portion of an asymmetric
    cryptographic key, making no assumptions about which algorithm.
-
-
-
-Pala, et al.               Expires 1 June 2024                  [Page 3]
-
-Internet-Draft         k-of-n Composite Signatures         November 2023
-
 
    K-of-N: A k-of-n signature is a signature that is valid if and only
    if at least k of the n component signatures are supported.
@@ -218,12 +221,9 @@ Internet-Draft         k-of-n Composite Signatures         November 2023
 
 
 
-
-
-
-Pala, et al.               Expires 1 June 2024                  [Page 4]
+Pala, et al.               Expires 3 June 2024                  [Page 4]
 
-Internet-Draft         k-of-n Composite Signatures         November 2023
+Internet-Draft         k-of-n Composite Signatures         December 2023
 
 
 2.1.  Alternative Algorithms Support (k-of-n)
@@ -277,9 +277,9 @@ Internet-Draft         k-of-n Composite Signatures         November 2023
 
 
 
-Pala, et al.               Expires 1 June 2024                  [Page 5]
+Pala, et al.               Expires 3 June 2024                  [Page 5]
 
-Internet-Draft         k-of-n Composite Signatures         November 2023
+Internet-Draft         k-of-n Composite Signatures         December 2023
 
 
    In other words, the K-of-N approach differs from the Explicit
@@ -299,10 +299,9 @@ Internet-Draft         k-of-n Composite Signatures         November 2023
    Composite key, and K the minimum number of component algorithms that
    must be supported by the cypto layer (and successfully verified) for
    the K-of-N Composite signature to be considered valid.  The maximum
-   allowed value for N is kofn-CompositeComponentsMax (16) and the
-   maximum allowed value for K is kofn-CompositeThresholdMax (15).  When
-   K is used, it MUST be less than N to allow for N - K algorithms to be
-   skipped (if unknown).
+   allowed value for N is MaxComponents (16) and the maximum allowed
+   value for K is MaxThreshold (15).  When K is used, it MUST be less
+   than N to allow for N - K algorithms to be skipped (if unknown).
 
 3.  K-of-N Composite Keys
 
@@ -325,25 +324,19 @@ Internet-Draft         k-of-n Composite Signatures         November 2023
    produces a composite public key pk as per Section 3.3 and a composite
    secret key sk is per Section 3.2.
 
-
-
-
-
-
-
-
-
-Pala, et al.               Expires 1 June 2024                  [Page 6]
-
-Internet-Draft         k-of-n Composite Signatures         November 2023
-
-
 3.2.  K-of-N Composite Private Keys
 
    This section provides an encoding for K-of-N Composite private keys
    intended for PKIX protocols and other applications that require an
    interoperable format for transmitting private keys, such as PKCS #8
    [RFC5958], PKCS #12 [RFC7292], CMP [RFC4210], or CRMF [RFC4211].
+
+
+
+Pala, et al.               Expires 3 June 2024                  [Page 6]
+
+Internet-Draft         k-of-n Composite Signatures         December 2023
+
 
    Although it is possible to use different types of storage for the
    individual components of a K-of-N Composite key (e.g., certified key
@@ -354,30 +347,27 @@ Internet-Draft         k-of-n Composite Signatures         November 2023
    CompositePrivateKey where each component key is a OneAsymmetricKey
    [RFC5958] object:
 
-     kofn-CompositeComponentsMax INTEGER ::= 16
+   MaxComponents INTEGER ::= 16
          -- Maximum number of allowed components in a Key
 
-     kofn-CompositePrivateKey ::= SEQUENCE SIZE (2..kofn-CompositeComponentsMax) OF OneAsymmetricKey
-
-   The parameters field is of type kofn-CompositeKeyParams and is
-   defined as follows:
-
-     kofn-CompositeThresholdMax INTEGER ::= 15
-         -- Maximum number of allowed components in a Key
-
-     kofn-CompositeThreshold ::= INTEGER (1..kofn-CompositeThresholdMax)
+   MaxThreshold INTEGER ::= 15
          -- Maximum value for required algoritmic threshold
 
-     kofn-CompositeComponentKeyParams ::= SEQUENCE {
-       componentAlgorithm      algorithmIdentifier,
-       isRequired              BOOLEAN DEFAULT TRUE OPTIONAL,
-     }
+   CompositeThreshold ::= INTEGER (1..MaxThreshold)
+         -- Allowed value ranges for the K-of-N threshold (K)
 
-     kofn-CompositeKeyParams ::= SEQUENCE {
-       componentKeyParams      SEQUENCE SIZE (2..16) OF kofn-CompositeComponentKeyParams,
-       hashAlgorithm           algorithmIdentifier DEFAULT OID(SHA384),
-       threshold               kofn-CompositeThreshold OPTIONAL,
-     }
+   kofn-CompositePrivateKey ::= SEQUENCE SIZE (2..MaxComponents)
+     OF OneAsymmetricKey
+
+   The parameters field is of type kofn-CompositeParams and is defined
+   as follows:
+
+   kofn-CompositeParams ::= SEQUECE {
+     hashAlgorithm           AlgorithmIdentifier,
+       -- Identifier for the hash algorithm used to pre-hash the message
+     threshold               CompositeThreshold OPTIONAL,
+       -- Number of required supported algorithms (must be less than N)
+   }
 
    The use of any Composite or hybrid algorithm (e.g., the pk-kofn-
    CompositePublicKey or any of the Explicit Composite algorithms
@@ -387,20 +377,22 @@ Internet-Draft         k-of-n Composite Signatures         November 2023
    The order of the component keys MUST be the same as the order defined
    for the corresponding public key components.
 
-
-
-Pala, et al.               Expires 1 June 2024                  [Page 7]
-
-Internet-Draft         k-of-n Composite Signatures         November 2023
-
-
    When a kofn-CompositePrivateKey is conveyed inside a OneAsymmetricKey
    structure (version 1 of which is also known as PrivateKeyInfo)
    [RFC5958], the privateKeyAlgorithm field SHALL be set to id-kofn-
    CompositeCrypto value, the privateKey field SHALL contain the kofn-
    CompositePrivateKey data.  Associated public key material MAY be
-   present in the the publicKey field or directly in the `kofn-
-   CompositePriva
+   present in the the publicKey field.
+
+
+
+
+
+
+Pala, et al.               Expires 3 June 2024                  [Page 7]
+
+Internet-Draft         k-of-n Composite Signatures         December 2023
+
 
 3.2.1.  K-of-N Private Key storage considerations
 
@@ -419,16 +411,22 @@ Internet-Draft         k-of-n Composite Signatures         November 2023
    CompositeCrypto OID and the associated definition of K-of-N Composite
    public key (pk-kofn-CompositePublicKey) is provided as follows:
 
-             pk-kofn-CompositePublicKey PUBLIC-KEY ::= {
-               id id-kofn-CompositeCrypto
-               KeyValue pk-kofn-CompositePublicKey
-               Params TYPE kofn-CompositeKeyParams ARE required
-               PrivateKey kofn-CompositePrivateKey
-             }
+        kofn-CompositePublicKeyParams ::= SEQUENCE {
+          params                  kofn-CompositeParams,
+          componentsParams        SEQUENCE SIZE (1..MaxComponents)
+              OF AlgorithmIdentifier,
+        }
+
+        pk-kofn-CompositePublicKey PUBLIC-KEY ::= {
+          id id-kofn-CompositeCrypto
+          KeyValue pk-kofn-CompositePublicKey
+          Params TYPE kofn-CompositePublicKeyParams ARE required
+          PrivateKey kofn-CompositePrivateKey
+        }
 
    The use of any Composite algorithms (e.g., the pk-kofn-
    CompositePublicKey or any of the Explicit Composite algorithms
-   defined in [I-D.ounsworth-pq-composite-sigs] is NOT allowed as a
+   defined in [I-D.ounsworth-pq-composite-sigs]) is NOT allowed as a
    component of a pk-kofn-CompositePublicKey.
 
 4.  K-of-N Composite Signatures
@@ -440,34 +438,39 @@ Internet-Draft         k-of-n Composite Signatures         November 2023
    and two associated algorithms for signature generation and
    validation.
 
-
-
-
-
-
-Pala, et al.               Expires 1 June 2024                  [Page 8]
-
-Internet-Draft         k-of-n Composite Signatures         November 2023
-
-
    Although K-of-N Composite signatures are defined as a sequence of
    component signatures, as detailed in many parts of this document and
    in alignment with Explicit Composite processes, the sign and verify
    algorithms are to be considered as a single atomic operations.
+
+
+
+Pala, et al.               Expires 3 June 2024                  [Page 8]
+
+Internet-Draft         k-of-n Composite Signatures         December 2023
+
 
 5.  K-of-N Composite Signature Structure
 
    The kofn-CompositeSignatureParams and sa-kofn-CompositeSignature
    structures are defined as follows:
 
-     <!-- kofn-CompositeSignatureParams ::= OBJECT IDENTIFIER DEFAULT(SHA512) -->
+   kofn-CompositeSignatureParams ::= SEQUENCE {
+     componentsParams    SEQUENCE SIZE
+         (1..MaxComponents) OF AlgorithmIdentifier,
+     hashAlgorithm   OBJECT IDENTIFIER OPTIONAL,
+   }
 
-     sa-kofn-CompositeSignature SIGNATURE-ALGORITHM ::= {
-           IDENTIFIER id-kofn-CompositeCrypto
-           VALUE kofn-CompositeSignatureValue
-           PARAMS kofn-CompositeSignatureParams ARE optional
-           PUBLIC-KEYS { pk-kofn-CompositePublicKey }
-           SMIME-CAPS { IDENTIFIED BY id-kofn-CompositeCrypto } }
+   kofn-CompositeComponentSignatureValue ::= SEQUENCE
+       SIZE (1..MaxComponents) OF BIT STRING
+
+   sa-kofn-CompositeSignature SIGNATURE-ALGORITHM ::= {
+         IDENTIFIER id-kofn-CompositeCrypto
+         VALUE kofn-CompositeSignatureValue
+         PARAMS TYPE kofn-CompositeSignatureParams ARE optional
+         PUBLIC-KEYS { pk-kofn-CompositePublicKey }
+         SMIME-CAPS { IDENTIFIED BY id-kofn-CompositeCrypto }
+   }
 
    When a K-of-N Composite Public Key has no defined hashAlgorithm
    parameter, the signer MUST include the hashAlgorithm parameter in the
@@ -495,16 +498,17 @@ Internet-Draft         k-of-n Composite Signatures         November 2023
    which are defined in Section 5.2 and Section 5.3 respectively and can
    be summarized as follows:
 
+
+
+
+Pala, et al.               Expires 3 June 2024                  [Page 9]
+
+Internet-Draft         k-of-n Composite Signatures         December 2023
+
+
    *  kofn-Sign(sk, Message) -> (signature): A signing algorithm which
       takes as input a secret key sk and a Message, and outputs a
       signature.
-
-
-
-Pala, et al.               Expires 1 June 2024                  [Page 9]
-
-Internet-Draft         k-of-n Composite Signatures         November 2023
-
 
    *  kofn-Verify(pk, Message, signature) -> true or false: A
       verification algorithm which takes as input a public key, a
@@ -553,13 +557,9 @@ Internet-Draft         k-of-n Composite Signatures         November 2023
 
 
 
-
-
-
-
-Pala, et al.               Expires 1 June 2024                 [Page 10]
+Pala, et al.               Expires 3 June 2024                 [Page 10]
 
-Internet-Draft         k-of-n Composite Signatures         November 2023
+Internet-Draft         k-of-n Composite Signatures         December 2023
 
 
 kofn-Sign (sk, Message) -> (signature)
@@ -613,9 +613,9 @@ Signature Generation Process:
 
 
 
-Pala, et al.               Expires 1 June 2024                 [Page 11]
+Pala, et al.               Expires 3 June 2024                 [Page 11]
 
-Internet-Draft         k-of-n Composite Signatures         November 2023
+Internet-Draft         k-of-n Composite Signatures         December 2023
 
 
    kofn-CompositePrivateKey from component keys stored in separate
@@ -669,9 +669,9 @@ Internet-Draft         k-of-n Composite Signatures         November 2023
 
 
 
-Pala, et al.               Expires 1 June 2024                 [Page 12]
+Pala, et al.               Expires 3 June 2024                 [Page 12]
 
-Internet-Draft         k-of-n Composite Signatures         November 2023
+Internet-Draft         k-of-n Composite Signatures         December 2023
 
 
    When the public key parameter K is set to one (1), the validation
@@ -725,9 +725,9 @@ Output:
 
 
 
-Pala, et al.               Expires 1 June 2024                 [Page 13]
+Pala, et al.               Expires 3 June 2024                 [Page 13]
 
-Internet-Draft         k-of-n Composite Signatures         November 2023
+Internet-Draft         k-of-n Composite Signatures         December 2023
 
 
 1. Check keys, signatures, and algorithms for consistency.
@@ -781,9 +781,9 @@ Internet-Draft         k-of-n Composite Signatures         November 2023
 
 
 
-Pala, et al.               Expires 1 June 2024                 [Page 14]
+Pala, et al.               Expires 3 June 2024                 [Page 14]
 
-Internet-Draft         k-of-n Composite Signatures         November 2023
+Internet-Draft         k-of-n Composite Signatures         December 2023
 
 
                                Figure 3
@@ -837,9 +837,9 @@ Internet-Draft         k-of-n Composite Signatures         November 2023
 
 
 
-Pala, et al.               Expires 1 June 2024                 [Page 15]
+Pala, et al.               Expires 3 June 2024                 [Page 15]
 
-Internet-Draft         k-of-n Composite Signatures         November 2023
+Internet-Draft         k-of-n Composite Signatures         December 2023
 
 
    Differently from the explicit composite case, if K-of-N is used with
@@ -849,9 +849,11 @@ Internet-Draft         k-of-n Composite Signatures         November 2023
    relying on the non-deprecated algorithm.
 
    The list of deprecated algorithms that are to be considered automatic
-   validation "failures" can be directly configured as a parameter in
+   validation "unknowns" can be directly configured as a parameter in
    the validating entity's process, or by accessing a trusted source of
    information.
+
+6.2.  The DeprecatedKeyTypes extension
 
    In an ecosystem such as the Internet PKI or IoT PKIs, since algorithm
    deprecation can be seen as another form of (mass) revocation, a
@@ -859,44 +861,82 @@ Internet-Draft         k-of-n Composite Signatures         November 2023
    by adding a specific extension to Certificate Revocation Lists
    [RFC5280] or Online Certificate Status Protocol [RFC6960] responses.
 
-   We define a new deprecated-algorithms extension together with the
-   associated id-ext-deprecated-algorithms identifier.  The data
-   structure of the extension is defined as a SEQUENCE of
-   DeprecatedAlgorithm.  Each DeprecatedAlgorithm is defined as an
-   OBJECT IDENTIFIER.
+   We define a new DeprecatedKeyTypes extension together with the
+   associated id-ce-deprecatedKeyTypes identifier.  The data structure
+   of the extension is defined as a SEQUENCE of OBJECT IDENTIFIER.  The
+   corresponding ASN.1 structures are defined as follows:
 
-   We define the following identifier:
-
-   id-ce-deprecatedAlgsList OBJECT IDENTIFIER ::= {
+   id-ce-deprecatedKeyTypes OBJECT IDENTIFIER ::= {
          iso(1) identified-organization(3) dod(6)
          internet(1) private(4) enterprise(1) OpenCA(18227)
          Extensions(3) deprecated-algs (2) }
 
+   DeprecatedKeyTypes ::= SEQUENCE SIZE (1..MaxThreshold)
+         OF OBJECT IDENTIFIER
+
+   When this extension is present in a CRL or OCSP response, the
+   validating party MUST consider the algorithms listed in the extension
+   as "unknown", even in the case where the algorithm is supported by
+   the device.  At a practical level, this means that the validation of
+   a component signature that carries a deprecated algorithm identifier
+   MUST fail if the threshold (or K-of-N) validations is not met because
+   of the deprecation of algorithms.
+
+   For example, let's imagine a K-of-N Composite key that combines
+   AlgorithmA and AlgorithmB together.  Let's also imagine that a device
+   can only validate AlgorithmA and does not have support for
+   AlgorithmB.  If the K-of-N threshold is set to 1, then the device can
+   still validate the composite signature since it can still rely on
+   AlgorithmA.  However, if AlgorithmA is deprecated via the
+   DeprecatedKeyTypes extension, then the validation MUST fail because
+   the device can no longer rely on AlgorithmA.
+
+
+
+Pala, et al.               Expires 3 June 2024                 [Page 16]
+
+Internet-Draft         k-of-n Composite Signatures         December 2023
+
+
+6.3.  The RequiredKeyTypes extension
+
+   When backward or forward compatibility is required, it might be
+   useful to provide the possibility to pin specific algorithms to be
+   required to be supported during signature and validations processes.
+
+   For example, when a K-of-N is used with N = 3 and K =2, there migth
+   be requirements to make sure that one of the two required algorithms
+   to be validated is a specific one (e.g., AlgorithmA).
+
+   To handle this situation, we define a new RequiredKeyTypes extension,
+   together with the associated id-ce-requiredKeyTypes identifier, that
+   can be added to Certificate Revocation Lists [RFC5280], Online
+   Certificate Status Protocol [RFC6960] responses.
+
+   We define a new RequiredKeyTypes extension together with the
+   associated id-ce-requiredKeyTypes identifier.  The data structure of
+   the extension is defined as a SEQUENCE of OBJECT IDENTIFIER.  The
+   corresponding ASN.1 structures are defined as follows:
+
+   id-ce-requiredKeyTypes OBJECT IDENTIFIER ::= {
+         iso(1) identified-organization(3) dod(6)
+         internet(1) private(4) enterprise(1) OpenCA(18227)
+         Extensions(3) required-algs (3) }
+
+   RequiredKeyTypes ::= SEQUENCE SIZE (1..MaxThreshold)
+         OF OBJECT IDENTIFIER
+
 7.  IANA Considerations
 
-   This document registers the following in the SMI "Security for PKIX
-   Algorithms (1.3.6.1.5.5.7.6)" registry:
-
-   id-kofn-CompositeCrypto OBJECT IDENTIFIER ::= {
-       iso(1) identified-organization(3) dod(6) internet(1) security(5)
-       mechanisms(5) pkix(7) algorithms(6) id-multikey-key(??) }
-
-   This document registers the following in the SMI " " registry:
-
-   id-ce-deprecatedAlgsList OBJECT IDENTIFIER ::= { id-ce deprecatedAlgsList(??) }
+   No IANA actions are required by this document.
 
 8.  Security Considerations
+
+   TBD.
 
 9.  References
 
 9.1.  Normative References
-
-
-
-Pala, et al.               Expires 1 June 2024                 [Page 16]
-
-Internet-Draft         k-of-n Composite Signatures         November 2023
-
 
    [I-D.ounsworth-pq-composite-keys]
               Ounsworth, M., Gray, J., Pala, M., and J. Klaußner,
@@ -905,6 +945,14 @@ Internet-Draft         k-of-n Composite Signatures         November 2023
               pq-composite-keys-05, 29 May 2023,
               <https://datatracker.ietf.org/doc/html/draft-ounsworth-pq-
               composite-keys-05>.
+
+
+
+
+Pala, et al.               Expires 3 June 2024                 [Page 17]
+
+Internet-Draft         k-of-n Composite Signatures         December 2023
+
 
    [I-D.ounsworth-pq-composite-sigs]
               Ounsworth, M., Gray, J., Pala, M., and J. Klaußner,
@@ -946,14 +994,6 @@ Internet-Draft         k-of-n Composite Signatures         November 2023
               RFC 6960, DOI 10.17487/RFC6960, June 2013,
               <https://www.rfc-editor.org/info/rfc6960>.
 
-
-
-
-Pala, et al.               Expires 1 June 2024                 [Page 17]
-
-Internet-Draft         k-of-n Composite Signatures         November 2023
-
-
    [RFC7292]  Moriarty, K., Ed., Nystrom, M., Parkinson, S., Rusch, A.,
               and M. Scott, "PKCS #12: Personal Information Exchange
               Syntax v1.1", RFC 7292, DOI 10.17487/RFC7292, July 2014,
@@ -962,6 +1002,13 @@ Internet-Draft         k-of-n Composite Signatures         November 2023
    [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
               2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
               May 2017, <https://www.rfc-editor.org/info/rfc8174>.
+
+
+
+Pala, et al.               Expires 3 June 2024                 [Page 18]
+
+Internet-Draft         k-of-n Composite Signatures         December 2023
+
 
    [RFC8411]  Schaad, J. and R. Andrews, "IANA Registration for the
               Cryptographic Algorithm Object Identifier Range",
@@ -982,44 +1029,7 @@ Internet-Draft         k-of-n Composite Signatures         November 2023
               <https://datatracker.ietf.org/doc/html/draft-driscoll-pqt-
               hybrid-terminology-02>.
 
-Appendix A.  Explicit Algorithm Identifiers
-
-   This variant provides a rigid way of specifying supported
-   combinations of algorithms.
-
-   Although this variant limits the possibility for combining non-
-   standard algorithms (or algorithms not considered by the authors of
-   this document), the use of identifiers that identify pairs of
-   standard algorithms might be easier in certain situations such as
-   referencing and/or enforcing specific combinations of algorithms
-   without the need for developing additional validation procedures
-   external to the signature validation one.
-
-   Explicit algorithms must define a new signature algorithm which
-   consists of:
-
-   *  A new algorithm identifier OID for the explicit algorithm.
-
-   *  The algorithm identifier OID and PUBLIC-KEY type of each component
-      algorithm.
-
-
-
-Pala, et al.               Expires 1 June 2024                 [Page 18]
-
-Internet-Draft         k-of-n Composite Signatures         November 2023
-
-
-   *  Signature parameters either declared ABSENT, or defined with a
-      type and encoding.
-
-   The definition of the explicit algorithm identifiers follows the same
-   definitions provided in Section 4.2 of
-   [I-D.ounsworth-pq-composite-keys] with the exception of the
-   parameters that are not ABSENT but OPTIONAL and their TYPE is
-   MultiKey-params as defined in Section 3.3.
-
-Appendix B.  ASN.1 Module
+Appendix A.  ASN.1 Module
 
       kofn-Composite-Crypto-2023
         { joint-iso-itu-t(2) country(16) us(840) organization(1) OpenCA(18277)
@@ -1048,6 +1058,14 @@ Appendix B.  ASN.1 Module
            pkcs-9(9) smime(16) modules(0)
            id-mod-asymmetricKeyPkgV1(50) }
 
+
+
+
+Pala, et al.               Expires 3 June 2024                 [Page 19]
+
+Internet-Draft         k-of-n Composite Signatures         December 2023
+
+
    ;
 
    --
@@ -1057,14 +1075,6 @@ Appendix B.  ASN.1 Module
    -- Defined in ITU-T X.690
    der OBJECT IDENTIFIER ::=
      {joint-iso-itu-t asn1(1) ber-derived(2) distinguished-encoding(1)}
-
-
-
-
-Pala, et al.               Expires 1 June 2024                 [Page 19]
-
-Internet-Draft         k-of-n Composite Signatures         November 2023
-
 
    id-kofn-CompositeCrypto OBJECT IDENTIFIER ::= {
       iso(1) identified-organization(3) dod(6)
@@ -1104,6 +1114,14 @@ Internet-Draft         k-of-n Composite Signatures         November 2023
    kofn-CompositeComponentKeyParams ::= SEQUENCE {
       componentAlgorithm      algorithmIdentifier,
       isRequired              BOOLEAN DEFAULT TRUE OPTIONAL,
+
+
+
+Pala, et al.               Expires 3 June 2024                 [Page 20]
+
+Internet-Draft         k-of-n Composite Signatures         December 2023
+
+
    }
 
    kofn-CompositeKeyParams ::= SEQUENCE {
@@ -1114,14 +1132,6 @@ Internet-Draft         k-of-n Composite Signatures         November 2023
 
    pk-kofn-CompositePublicKey PUBLIC-KEY ::= {
       id id-kofn-CompositeCrypto
-
-
-
-Pala, et al.               Expires 1 June 2024                 [Page 20]
-
-Internet-Draft         k-of-n Composite Signatures         November 2023
-
-
       KeyValue pk-kofn-CompositePublicKey
       Params TYPE kofn-CompositeKeyParams ARE required
       PrivateKey kofn-CompositePrivateKey
@@ -1143,13 +1153,13 @@ Internet-Draft         k-of-n Composite Signatures         November 2023
 
    END
 
-Appendix C.  Intellectual Property Considerations
+Appendix B.  Intellectual Property Considerations
 
    The following IPR Disclosure relates to this draft:
 
    https://datatracker.ietf.org/ipr/3588/
 
-Appendix D.  Contributors and Acknowledgements
+Appendix C.  Contributors and Acknowledgements
 
    This document incorporates contributions and comments from a large
    group of experts.  The Editors would especially like to acknowledge
@@ -1161,6 +1171,13 @@ Appendix D.  Contributors and Acknowledgements
    Serge Mister (Entrust), Scott Fluhrer (Cisco Systems), Klaus-Dieter
    Wirth (D-Trust), and Francois Rousseau.
 
+
+
+Pala, et al.               Expires 3 June 2024                 [Page 21]
+
+Internet-Draft         k-of-n Composite Signatures         December 2023
+
+
    We are grateful to all, including any contributors who may have been
    inadvertently omitted from this list.
 
@@ -1169,16 +1186,7 @@ Appendix D.  Contributors and Acknowledgements
    "Copying always makes things easier and less error prone" -
    [RFC8411].
 
-
-
-
-
-Pala, et al.               Expires 1 June 2024                 [Page 21]
-
-Internet-Draft         k-of-n Composite Signatures         November 2023
-
-
-D.1.  Making contributions
+C.1.  Making contributions
 
    Additional contributions to this draft are welcome.  Please see the
    working copy of this draft at, as well as open issues at:
@@ -1216,6 +1224,16 @@ Authors' Addresses
    Email: <mike.ounsworth@entrust.com>
 
 
+
+
+
+
+
+Pala, et al.               Expires 3 June 2024                 [Page 22]
+
+Internet-Draft         k-of-n Composite Signatures         December 2023
+
+
    John Gray
    Entrust Limited
    2500 Solandt Road -- Suite 100
@@ -1229,4 +1247,42 @@ Authors' Addresses
 
 
 
-Pala, et al.               Expires 1 June 2024                 [Page 22]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Pala, et al.               Expires 3 June 2024                 [Page 23]
