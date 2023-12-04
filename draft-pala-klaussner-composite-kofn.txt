@@ -5,11 +5,11 @@
 LAMPS                                                            M. Pala
 Internet-Draft                                                 CableLabs
 Intended status: Standards Track                            J. Klaussner
-Expires: 3 June 2024                                        D-Trust GmbH
+Expires: 6 June 2024                                        D-Trust GmbH
                                                             M. Ounsworth
                                                                  J. Gray
                                                                  Entrust
-                                                         1 December 2023
+                                                         4 December 2023
 
 
           k-of-n Composite Signatures for Multi-Algorithm PKI
@@ -53,7 +53,7 @@ Status of This Memo
 
 
 
-Pala, et al.               Expires 3 June 2024                  [Page 1]
+Pala, et al.               Expires 6 June 2024                  [Page 1]
 
 Internet-Draft         k-of-n Composite Signatures         December 2023
 
@@ -63,7 +63,7 @@ Internet-Draft         k-of-n Composite Signatures         December 2023
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 3 June 2024.
+   This Internet-Draft will expire on 6 June 2024.
 
 Copyright Notice
 
@@ -109,7 +109,7 @@ Table of Contents
 
 
 
-Pala, et al.               Expires 3 June 2024                  [Page 2]
+Pala, et al.               Expires 6 June 2024                  [Page 2]
 
 Internet-Draft         k-of-n Composite Signatures         December 2023
 
@@ -165,7 +165,7 @@ Internet-Draft         k-of-n Composite Signatures         December 2023
 
 
 
-Pala, et al.               Expires 3 June 2024                  [Page 3]
+Pala, et al.               Expires 6 June 2024                  [Page 3]
 
 Internet-Draft         k-of-n Composite Signatures         December 2023
 
@@ -221,7 +221,7 @@ Internet-Draft         k-of-n Composite Signatures         December 2023
 
 
 
-Pala, et al.               Expires 3 June 2024                  [Page 4]
+Pala, et al.               Expires 6 June 2024                  [Page 4]
 
 Internet-Draft         k-of-n Composite Signatures         December 2023
 
@@ -277,7 +277,7 @@ Internet-Draft         k-of-n Composite Signatures         December 2023
 
 
 
-Pala, et al.               Expires 3 June 2024                  [Page 5]
+Pala, et al.               Expires 6 June 2024                  [Page 5]
 
 Internet-Draft         k-of-n Composite Signatures         December 2023
 
@@ -333,7 +333,7 @@ Internet-Draft         k-of-n Composite Signatures         December 2023
 
 
 
-Pala, et al.               Expires 3 June 2024                  [Page 6]
+Pala, et al.               Expires 6 June 2024                  [Page 6]
 
 Internet-Draft         k-of-n Composite Signatures         December 2023
 
@@ -389,7 +389,7 @@ Internet-Draft         k-of-n Composite Signatures         December 2023
 
 
 
-Pala, et al.               Expires 3 June 2024                  [Page 7]
+Pala, et al.               Expires 6 June 2024                  [Page 7]
 
 Internet-Draft         k-of-n Composite Signatures         December 2023
 
@@ -445,7 +445,7 @@ Internet-Draft         k-of-n Composite Signatures         December 2023
 
 
 
-Pala, et al.               Expires 3 June 2024                  [Page 8]
+Pala, et al.               Expires 6 June 2024                  [Page 8]
 
 Internet-Draft         k-of-n Composite Signatures         December 2023
 
@@ -501,7 +501,7 @@ Internet-Draft         k-of-n Composite Signatures         December 2023
 
 
 
-Pala, et al.               Expires 3 June 2024                  [Page 9]
+Pala, et al.               Expires 6 June 2024                  [Page 9]
 
 Internet-Draft         k-of-n Composite Signatures         December 2023
 
@@ -557,7 +557,7 @@ Internet-Draft         k-of-n Composite Signatures         December 2023
 
 
 
-Pala, et al.               Expires 3 June 2024                 [Page 10]
+Pala, et al.               Expires 6 June 2024                 [Page 10]
 
 Internet-Draft         k-of-n Composite Signatures         December 2023
 
@@ -613,7 +613,7 @@ Signature Generation Process:
 
 
 
-Pala, et al.               Expires 3 June 2024                 [Page 11]
+Pala, et al.               Expires 6 June 2024                 [Page 11]
 
 Internet-Draft         k-of-n Composite Signatures         December 2023
 
@@ -669,7 +669,7 @@ Internet-Draft         k-of-n Composite Signatures         December 2023
 
 
 
-Pala, et al.               Expires 3 June 2024                 [Page 12]
+Pala, et al.               Expires 6 June 2024                 [Page 12]
 
 Internet-Draft         k-of-n Composite Signatures         December 2023
 
@@ -725,7 +725,7 @@ Output:
 
 
 
-Pala, et al.               Expires 3 June 2024                 [Page 13]
+Pala, et al.               Expires 6 June 2024                 [Page 13]
 
 Internet-Draft         k-of-n Composite Signatures         December 2023
 
@@ -781,7 +781,7 @@ Internet-Draft         k-of-n Composite Signatures         December 2023
 
 
 
-Pala, et al.               Expires 3 June 2024                 [Page 14]
+Pala, et al.               Expires 6 June 2024                 [Page 14]
 
 Internet-Draft         k-of-n Composite Signatures         December 2023
 
@@ -837,7 +837,7 @@ Internet-Draft         k-of-n Composite Signatures         December 2023
 
 
 
-Pala, et al.               Expires 3 June 2024                 [Page 15]
+Pala, et al.               Expires 6 June 2024                 [Page 15]
 
 Internet-Draft         k-of-n Composite Signatures         December 2023
 
@@ -893,7 +893,7 @@ Internet-Draft         k-of-n Composite Signatures         December 2023
 
 
 
-Pala, et al.               Expires 3 June 2024                 [Page 16]
+Pala, et al.               Expires 6 June 2024                 [Page 16]
 
 Internet-Draft         k-of-n Composite Signatures         December 2023
 
@@ -949,7 +949,7 @@ Internet-Draft         k-of-n Composite Signatures         December 2023
 
 
 
-Pala, et al.               Expires 3 June 2024                 [Page 17]
+Pala, et al.               Expires 6 June 2024                 [Page 17]
 
 Internet-Draft         k-of-n Composite Signatures         December 2023
 
@@ -1005,7 +1005,7 @@ Internet-Draft         k-of-n Composite Signatures         December 2023
 
 
 
-Pala, et al.               Expires 3 June 2024                 [Page 18]
+Pala, et al.               Expires 6 June 2024                 [Page 18]
 
 Internet-Draft         k-of-n Composite Signatures         December 2023
 
@@ -1061,7 +1061,7 @@ Internet-Draft         k-of-n Composite Signatures         December 2023
 
 
 
-Pala, et al.               Expires 3 June 2024                 [Page 19]
+Pala, et al.               Expires 6 June 2024                 [Page 19]
 
 Internet-Draft         k-of-n Composite Signatures         December 2023
 
@@ -1117,7 +1117,7 @@ Appendix A.  ASN.1 Module
 
 
 
-Pala, et al.               Expires 3 June 2024                 [Page 20]
+Pala, et al.               Expires 6 June 2024                 [Page 20]
 
 Internet-Draft         k-of-n Composite Signatures         December 2023
 
@@ -1173,7 +1173,7 @@ Internet-Draft         k-of-n Composite Signatures         December 2023
 
 
 
-Pala, et al.               Expires 3 June 2024                 [Page 21]
+Pala, et al.               Expires 6 June 2024                 [Page 21]
 
 Internet-Draft         k-of-n Composite Signatures         December 2023
 
@@ -1229,7 +1229,7 @@ Internet-Draft         k-of-n Composite Signatures         December 2023
 
 
 
-Pala, et al.               Expires 3 June 2024                 [Page 22]
+Pala, et al.               Expires 6 June 2024                 [Page 22]
 
 Internet-Draft         k-of-n Composite Signatures         December 2023
 
@@ -1285,7 +1285,7 @@ Authors' Addresses
 
 
 
-Pala, et al.               Expires 3 June 2024                 [Page 23]
+Pala, et al.               Expires 6 June 2024                 [Page 23]
 
 Internet-Draft         k-of-n Composite Signatures         December 2023
 
@@ -1341,4 +1341,4 @@ Internet-Draft         k-of-n Composite Signatures         December 2023
 
 
 
-Pala, et al.               Expires 3 June 2024                 [Page 24]
+Pala, et al.               Expires 6 June 2024                 [Page 24]
