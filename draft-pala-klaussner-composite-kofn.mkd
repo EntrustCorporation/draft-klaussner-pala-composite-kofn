@@ -293,16 +293,7 @@ OID defined as follows:
 ~~~
 {: artwork-name="id-kofn-CompositeCrypto OID definition" artwork-align="center" }
 
-## K-of-N Composite Key Generation {#sec_kofn_keygen}
-
-The `KeyGen() -> (pk, sk)` is defined as a probabilistic key generation algorithm,
-which generates a public key pk and a secret key sk.
-
-The `KeyGen() -> (pk, sk)` of a composite algorithm performs the `KeyGen()` of the
-respective component signature algorithms and it produces a composite public key `pk`
-as per {{sec_kofn_pub_keys}} and a composite secret key `sk` is per {{sec_kofn_priv_keys}}.
-
-## K-of-N Composite Private Keys {#sec_kofn_priv_keys}
+## Private Keys {#sec_kofn_priv_keys}
 
 This section provides an encoding for K-of-N Composite private keys intended for PKIX
 protocols and other applications that require an interoperable format for
@@ -362,7 +353,7 @@ field SHALL be set to `id-kofn-CompositeCrypto` value, the privateKey field SHAL
 the `kofn-CompositePrivateKey` data. Associated public key material MAY be present in the
 the `publicKey` field.
 
-### K-of-N Private Key storage considerations {#sec_kofn_priv_key_storage}
+### Private Keys and Storage {#sec_kofn_priv_key_storage}
 
 In some usecases the private keys that comprise a composite key may not be represented in a
 single structure or even be contained in a single cryptographic module; for example if one
@@ -398,6 +389,15 @@ The use of any Composite algorithms (e.g., the `pk-kofn-CompositePublicKey` or a
 Explicit Composite algorithms defined in {{-composite_sigs}}) is NOT allowed as a component
 of a `pk-kofn-CompositePublicKey`.
 
+## Key Generation {#sec_kofn_keygen}
+
+The `KeyGen() -> (pk, sk)` is defined as a probabilistic key generation algorithm,
+which generates a public key pk and a secret key sk.
+
+The `KeyGen() -> (pk, sk)` of a composite algorithm performs the `KeyGen()` of the
+respective component signature algorithms and it produces a composite public key `pk`
+as per {{sec_kofn_pub_keys}} and a composite secret key `sk` is per {{sec_kofn_priv_keys}}.
+
 # K-of-N Composite Signatures {#sec_kofn_sigs}
 
 A K-of-N Composite signature allows two or more underlying signature algorithms to be combined
@@ -409,7 +409,7 @@ Although K-of-N Composite signatures are defined as a sequence of component sign
 in many parts of this document and in alignment with Explicit Composite processes, the sign and
 verify algorithms are to be considered as a single atomic operations.
 
-# K-of-N Composite Signature Structure {#sec_kofn_sig_structs}
+# Signature Data Structures {#sec_kofn_sig_structs}
 
 The `kofn-CompositeSignatureParams` and `sa-kofn-CompositeSignature` structures are defined as follows:
 <!-- The `sa-kofn-CompositeSignature` structure is defined as follows: -->
@@ -447,7 +447,7 @@ contain the `hashAlgorithm` parameter, the verifier MUST ignore the `hashAlgorit
 from the `kofn-CompositeSignatureParams` structure and use the one from the K-of-N Composite
 Public Key.
 
-## K-of-N Composite Signature Processes {#sec_kofn_processes}
+## Cryptographic Primitives {#sec_kofn_processes}
 
 In this section we define K-of-N Composite Signatures as a cryptographic primitive that consists
 of three algorithms. The first one is the `kofn-KeyGen()` and is defined in {{sec_kofn_keys}}.
@@ -659,7 +659,7 @@ with a K-of-N Composite algorithm:
 ~~~
 {: #kofn-comp-verify artwork-align="center" artwork-name="K-of-N Composite Signatures Verify Process" }
 
-# Deprecating Algorithms and Impact over signature validations
+# Algorithm Management {#sec-deprecation}
 
 Traditionally, a public key, certificate, or signature contains a single
 cryptographic algorithm. To revoke such a certificate due to algorithm
@@ -677,17 +677,25 @@ it is possible to dynamically switch among which algorithms are going to
 be used for signature validations by informing the validating entity about
 the OIDs of the individual algorithms that are considered "failures".
 
-In fact, the validating entity can automatically "fail" the validation of
+Additionally, by integrating the concept of required algorithms, in the
+K-of-N case it is possible to make sure that specific algorithms are
+always required to be supported by the validating entity. This could be
+the case, for example, when the trust in one of the algorithm might be
+higher (e.g., certified and/or longer crypto-analysis history).
+
+<!-- In fact, the validating entity can automatically "fail" the validation of
 component signatures that match any value present in the list of revoked
 algorithms, exactly in the same fashion as when the algorithm is not
-supported in the first place.
+supported in the first place. -->
 
-## Distributing the list of deprecated algorithms
+## Validation Policy and Revocation Information {#validation_policy}
 
 As we just mentioned, in multi-algorithm environments, there are situations
 where the validation of a component signature that carries a deprecated
 algorithm identifier might still be allowed, e.g. when at least another
-`K` algorithms validate correctly.
+`K` algorithms validate correctly. In a K-of-N environment, this means that
+the device does not need to be re-provisioned (or replaced) and can continue
+to operate by relying on the non-deprecated algorithm(s).
 
 On top of that, there are also typical use-cases where the deprecation
 of an algorithm is paramount to make sure that authentications do not
@@ -697,16 +705,17 @@ composite signature (e.g., it can validate RSA signatures but no other)
 are still part of the network. When the only algorithm that they can use
 is deprecated, validation of composite signature MUST fail.
 
-Differently from the explicit composite case, if K-of-N is used with an
-explicit threshold parameter and the device can still successfully validate
-at least `K` component signatures, the device does not need to be
-re-provisioned (or replaced) and can continue to operate by relying on the
-non-deprecated algorithm.
-
 The list of deprecated algorithms that are to be considered automatic
 validation "unknowns" can be directly configured as a parameter in the
 validating entity's process, or by accessing a trusted source of
-information.
+information such as a trusted Certificate Revocation List (CRL) or Online
+Certificate Status Protocol (OCSP) response.
+
+Similarly, the list of required algorithms that cannot be skipped,
+even if not supported by the device can be directly configured as a
+parameter in the validating entity's process, or by accessing a trusted
+source of information such as a trusted Certificate Revocation List (CRL)
+or Online Certificate Status Protocol (OCSP) response.
 
 ## The `DeprecatedKeyTypes` extension {#deprecated_key_types}
 
