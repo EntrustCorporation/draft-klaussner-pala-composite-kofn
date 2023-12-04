@@ -13,7 +13,7 @@ Expires: 6 June 2024                                        D-Trust GmbH
 
 
           k-of-n Composite Signatures for Multi-Algorithm PKI
-                 draft-pala-klaussner-composite-kofn-00
+                 draft-pala-klaussner-composite-kofn-01
 
 Abstract
 
@@ -1258,7 +1258,7 @@ Authors' Addresses
    Louisville, Colorado,  80027
    United States of America
 
-   Email: <director@openca.org>
+   Email: director@openca.org
 
 
    Jan Klaussner
@@ -1267,7 +1267,7 @@ Authors' Addresses
    10969 Berlin
    Germany
 
-   Email: <jan.klaussner@d-trust.net>
+   Email: jan.klaussner@d-trust.net
 
 
    Mike Ounsworth
@@ -1276,7 +1276,7 @@ Authors' Addresses
    Ottawa, Ontario  K2K 3G5
    Canada
 
-   Email: <mike.ounsworth@entrust.com>
+   Email: mike.ounsworth@entrust.com
 
 
    John Gray
@@ -1293,7 +1293,7 @@ Internet-Draft         k-of-n Composite Signatures         December 2023
    Ottawa, Ontario  K2K 3G5
    Canada
 
-   Email: <john.gray@entrust.com>
+   Email: john.gray@entrust.com
 
 
 

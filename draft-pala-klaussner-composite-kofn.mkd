@@ -1,7 +1,7 @@
 ---
 title: k-of-n Composite Signatures for Multi-Algorithm PKI
 abbrev: k-of-n Composite Signatures
-docname: draft-pala-klaussner-composite-kofn-00
+docname: draft-pala-klaussner-composite-kofn-01
 
 # <!-- stand_alone: true -->
 ipr: trust200902
@@ -27,13 +27,13 @@ author:
       city: Louisville, Colorado
       country: United States of America
       code: 80027
-      email: <director@openca.org>
+      email: director@openca.org
     -
       ins: J. Klaußner
       fullname: Jan Klaußner
       asciiFullname: Jan Klaussner
       org: D-Trust GmbH
-      email: <jan.klaussner@d-trust.net>
+      email: jan.klaussner@d-trust.net
       street: Kommandantenstr. 15
       code: 10969
       city: Berlin
@@ -47,7 +47,7 @@ author:
       city: Ottawa, Ontario
       country: Canada
       code: K2K 3G5
-      email: <mike.ounsworth@entrust.com>
+      email: mike.ounsworth@entrust.com
 
     -
       ins: J. Gray
@@ -58,7 +58,7 @@ author:
       city: Ottawa, Ontario
       country: Canada
       code: K2K 3G5
-      email: <john.gray@entrust.com>
+      email: john.gray@entrust.com
 
 normative:
   I-D.ounsworth-pq-composite-keys: composite_keys
@@ -407,7 +407,7 @@ Although K-of-N Composite signatures are defined as a sequence of component sign
 in many parts of this document and in alignment with Explicit Composite processes, the sign and
 verify algorithms are to be considered as a single atomic operations.
 
-# Signature Data Structures {#sec_kofn_sig_structs}
+## Data Structures {#sec_kofn_sig_structs}
 
 The `kofn-CompositeSignatureParams` and `sa-kofn-CompositeSignature` structures are defined as follows:
 <!-- The `sa-kofn-CompositeSignature` structure is defined as follows: -->
