@@ -1,6 +1,6 @@
 ---
-title: K-threshold Composite Signatures for the Internet PKI
-abbrev: K-threshold Sigs
+title: k-of-n Composite Signatures for Multi-Algorithm PKI
+abbrev: k-of-n Composite Signatures
 docname: draft-pala-klaussner-composite-kofn-00
 
 # <!-- stand_alone: true -->
@@ -20,24 +20,45 @@ pi:    # can use array (if all yes) or hash here
 author:
     -
       ins: M. Pala
-      name: Massimiliano Pala
+      fullname: Massimiliano Pala
       org: CableLabs Inc.
       abbrev: CableLabs
       street: 858 Coal Creek Cir
       city: Louisville, Colorado
       country: United States of America
       code: 80027
-      email: director@openca.org
-
+      email: <director@openca.org>
     -
-      ins: J. Klaussner
-      name: Jan Klaussner
+      ins: J. Klaußner
+      fullname: Jan Klaußner
+      asciiFullname: Jan Klaussner
       org: D-Trust GmbH
-      email: jan.klaussner@d-trust.net
+      email: <jan.klaussner@d-trust.net>
       street: Kommandantenstr. 15
       code: 10969
       city: Berlin
       country: Germany
+    -
+      ins: M. Ounsworth
+      name: Mike Ounsworth
+      org: Entrust Limited
+      abbrev: Entrust
+      street: 2500 Solandt Road – Suite 100
+      city: Ottawa, Ontario
+      country: Canada
+      code: K2K 3G5
+      email: <mike.ounsworth@entrust.com>
+
+    -
+      ins: J. Gray
+      name: John Gray
+      org: Entrust Limited
+      abbrev: Entrust
+      street: 2500 Solandt Road – Suite 100
+      city: Ottawa, Ontario
+      country: Canada
+      code: K2K 3G5
+      email: <john.gray@entrust.com>
 
 normative:
   I-D.ounsworth-pq-composite-keys: composite_keys
@@ -55,23 +76,19 @@ informative:
 
 --- abstract
 
-With the need to evolve the cryptography used in today applications, 
-devices, and networks, there might be many scenarios where the use of a
-single-key certificate is not sufficient. For example, there might be the
-need for migrating between two existing algorithms (e.g., from classic
-to post-quantum) or there might be the need to test the capabilities of
-devices via test drivers and/or non-standard algorithms.
+With the need to evolve the cryptography used in today applications, devices, and networks, there are many
+scenarios where the use of a single-algorithm is not sufficient. For example, there might be the
+need for migrating between two existing algorithms because of a weakening of earlier generations (e.g., from classic
+or traditional to post-quantum or quantum-safe). Another example might involve the need to test, instead, the capabilities
+of devices via test drivers and/or non-standard algorithms. Another very common case is the need to combine
+certified cryptography (e.g., FIPS) with newer algorithms that are not yet certified or that are not planned
+for certification.
 
-Differently from the situation where algorithms are not yet (or no more)
-trusted to be used by themselves, this document addresses the use of multiple
-keys and signatures that can be individually trusted to implement a generic
-1-threshold and K-threshold signature validation procedures.
+This work extends the options provided by Explicit Composite, defined in {{-composite_sigs}}, by providing a
+mechanism to manage backward and forward compatibility via k-of-n signature validation procedures.
 
-This document provides the definition of a new type of multi-algorithm
-public key and relies on the definition of CompositePrivateKey,
-and CompositeSignature which are sequences of the respective structure for each
-component algorithm as defined in {{-composite_sigs}} and
-{{-composite_sigs}}.
+This document provides the definition of a new type of the kofn-CompositePublicKey and kofn-CompositeSignature
+which are aligned with the definitions of the respective structures for Explicit Composite {{-composite_sigs}}.
 
 <!-- End of Abstract -->
 
@@ -85,53 +102,105 @@ This document is consistent with the terminology defined in
 {{-pq_terminology}}. In addition, the following terminology
 is used throughout this document:
 
+ALGORITHM:
+          A standardized cryptographic primitive, as well as
+          any ASN.1 structures needed for encoding data and
+          metadata needed to use the algorithm. This document is
+          primarily concerned with algorithms for producing digital
+          signatures.
 
 BER:
-: Basic Encoding Rules (BER) as defined in {{X.690}}.
+          Basic Encoding Rules (BER) as defined in {{X.690}}.
 
-CLIENT:
-: Any software that is making use of a cryptographic key.
-  This includes a signer, verifier, encrypter, decrypter.
-      
-
-DER:
-: Distinguished Encoding Rules as defined in {{X.690}}.
-
-PKI:
-: Public Key Infrastructure, as defined in {{!RFC5280}}.
-
-PUBLIC / PRIVATE KEY:
-: The public and private portion of an asymmetric cryptographic
-  key, making no assumptions about which algorithm.
+COMPONENT ALGORITHM:
+          A single basic algorithm which is contained within a
+          composite algorithm.
 
 COMPONENT KEY:
-: One component of the Composite Key. For example, an RSA, a
-  Dilithium3 or a Falcon512 key.
+          One component of the Composite Key. For example, an RSA, a
+          ML-DSA or a FN-DSA key.
+
+COMPOSITE ALGORITHM:
+          An algorithm which is a sequence of two or more component
+          algorithms, as defined in {{sec_kofn_keys}}.
+
+CLIENT:
+          Any software that is making use of a cryptographic key.
+          This includes a signer, verifier, encrypter, decrypter.
+
+DER:
+          Distinguished Encoding Rules as defined in {{X.690}}.
+
+PKI:
+          Public Key Infrastructure, as defined in {{!RFC5280}}.
+
+POST-QUANTUM ALGORITHM:
+          Any cryptographic algorithm which is believed to be resistant
+          to classical and quantum cryptanalysis, such as the algorithms
+          being considered for standardization by NIST.
+
+PUBLIC / PRIVATE KEY:
+          The public and private portion of an asymmetric cryptographic
+          key, making no assumptions about which algorithm.
+
+K-of-N:
+          A k-of-n signature is a signature that is valid if and only if
+          at least k of the n component signatures are supported.
+
+N:
+          The number of component signatures in a K-of-N signature. The
+          maximum value of `N` is `kofn-CompositeComponentsMax` (16).
+
+K:
+          The number of component signatures that must be supported
+          (and correctly validated) in order for the k-of-n signature
+          to be valid. The maximum value of `K` is `kofn-CompositeThresholdMax`
+          (15).
+
+SIGNATURE:
+          A digital cryptographic signature, making no assumptions
+            about which algorithm.
+
+STRIPPING ATTACK:
+          An attack in which the attacker is able to downgrade the
+          cryptographic object to an attacker-chosen subset of
+          original set of component algorithms in such a way that
+          it is not detectable by the receiver. For example,
+          substituting a composite public key or signature for a
+          version with fewer components.
 
 # Introduction {#intro}
 
 When the trust in the cryptographic algorithms is not static (e.g., not
 enough crypto-analysis has happened yet or a new threat is envisioned to
-be deployable in the next future), there might be the need to combine 
-multiple algorithms together to address the crypto-uncertainty of the
-envisioned period.         
+be deployable in the next future), there might be the need to combine
+multiple algorithms together to provide different security properties.
 
-An example of such a situation can be found in the planning for the transition
+Similar considerations apply to the deployment of certified algorithms
+together with experimental or non-standard ones.
+
+<!-- An example of such a situation can be found in the planning for the transition
 to post-quantum cryptography (PQ or PQC). While classic algorithms will still
 be trusted for some time (but we do not know how much), there is uncertainty
 as to the strength of the new cryptographic algorithms. Unlike previous
 cryptographic algorithm migrations, the choice of when to migrate and which
-algorithms to migrate to, is not so clear. 
+algorithms to migrate to, is not so clear. This work provides a flexible
+mechanism to provide crypto-agility and migration paths especially suited
+for critical infrastructures and device networks. -->
 
-Even after the migration period, it may be advantageous for an entity
+Even after a migration period, it may be advantageous for an entity
 cryptographic identity to be composed of multiple public-key algorithms
-by using a Post-Quantum/Traditional (PQ/T) or Post-Quantum/Post-Quantum
-(PQ/PQ) Hybrid scheme.
+where different security and non-security properties might be provided through
+the use of hybrid solutions (multi-algorithms). In other words, this work
+provides a flexible mechanism for crypto-agility and migration paths deployments
+especially suited for critical infrastructures, device networks, and
+environments where the use of multiple algorithms is required but no
+change in the protocol is desired.
 
 For further considerations on the challenges related to crypto-agility,
 please refer to {{-composite_keys}}.
 
-## Alternative Algorithms Support {#algorithms}
+## Alternative Algorithms Support (k-of-n) {#algorithms}
 
 Although Composite cryptography and Hybrid solutions can be used in many
 common use-cases to protect against algorithmic failures over time, there
@@ -142,30 +211,55 @@ deploying newer devices and crypto algorithms.
 This is particularly true in environments where deployed devices might be
 distributed in the field such as infrastructure's network elements (e.g.,
 network routers, amplifiers, monitoring devices, cable modems, public access
-points, etc.). The use of multi-algorithms provides a mechanism for enabling
-forward compatibility with newer devices even when they cannot be upgraded.
+points, etc.) and access to resources outside the managed network is highly
+restricted (i.e., control interface traffic, not user-generated traffic).
+The use of multi-algorithms provides a mechanism for enabling forward and/or
+backward compatibility across devices with mixed upgrade capabilities.
 
-At a practical level this means that we need a mechanism to still be able to
+<!-- At a practical level this means that we need a mechanism to still be able to
 validate Composite signatures even when not all algorithms are supported by
-all devices. 
+all devices.  -->
 
-This work introduces the concept of alternative signatures which joins the
-family of hybrid options such as Composite Crypto.
+This work introduces the concept of K-of-N threshold signatures which joins the
+family of hybrid options such as the Explicit Composite signatures and KEMs.
 
-# The MultiKey Approach Overview {#overview}
+## Differences between K-of-N Composite and Explicit Composite {#overview}
 
-The MultiKey approach focus is to provide the possibility to validate Composite
-signatures even when not all algorithms that were used in the generation of the
-Composite signature are supported. From this point of view, the MultiKey approach
-differs from the Composite crypto one in that it allows relying parties to
-perform the validation of a subset of signatures instead of requiring the
-successful validation of all signatures.
+K-of-N Composite keys and signatures work very similarly to Explicit Composite signatures.
 
-We define `n` the number of component key in the MultiKey key, and `k` the minimum
-number of component signature successful validations required for the Composite
-signature to be considered valid.
+When generating a K-of-N Composite key, the process used is the same as the one used
+for the Explicit Composite case with the addition of required parameters that provide
+the details for the algorithms and the individual component's details.
 
-## 1-threshold and K-threshold signature validation {#threshold}
+When generating a signature, the process used for K-of-N Composite signatures is exactly
+the same as the one used in the Explicit Composite case.
+
+When validating a signature, the K-of-N Composite signatures' validation process
+MAY differ from the Explicit Composite case when parameters are present in the K-of-N
+Composite public key. In fact, as discussed in more details in a later Section, K-of-N Composite
+keys use parameters to specify the number of component algorithms that are required
+to be known by the crypto layer (and must validate correctly) and/or which components
+are considered required and which ones can be skipped.
+
+In other words, the K-of-N approach differs from the Explicit Composite crypto in that
+it allows relying parties to perform the validation of a subset of signatures if and
+only if the K-of-N parameter is present in the PublicKey (i.e., with the `K` value)
+and up to `X` algorithms are unknown to the device. It is obvious that `X` must be
+less then or equal to `K - N` .
+
+One of the important aspect that is worth mentioning is that the K-of-N approach only
+allows to skip validations of signatures if the specific component algorithm is not
+supported and it does NOT allow to skip the validation of a known algorithm if the
+signature is not correctly verified.
+
+In this work, we define `N` the number of component key in the K-of-N Composite key, and
+`K` the minimum number of component algorithms that must be supported by the cypto layer
+(and successfully verified) for the K-of-N Composite signature to be considered valid.
+The maximum allowed value for `N` is `MaxComponents` (16) and the maximum
+allowed value for `K` is `MaxThreshold` (15). When `K` is used, it MUST be
+less than `N` to allow for `N - K` algorithms to be skipped (if unknown).
+
+<!-- ## 1-threshold and K-threshold signature validation {#threshold}
 
 The MultiKey approach defined in this document leverages the same procedures
 and data structures defined for pk-Composite {{-composite_keys}} with the
@@ -183,146 +277,319 @@ the Composite signature is considered valid.
 
 In the rest of the section we focus on the description of private and public key
 structures, while in the next section we focus on the changes in the validation
-process when compared to signatures generated via Composite Keys.
+process when compared to signatures generated via Composite Keys. -->
 
-## MultiKey Private Keys {#private_keys}
+# K-of-N Composite Keys {#sec_kofn_keys}
 
-This section provides an encoding for MultiKey private keys intended for PKIX
+K-of-N Composite Crypto algorithm is identified by the `id-kofn-CompositeCrypto`
+OID defined as follows:
+
+~~~ ASN.1
+  id-kofn-CompositeCrypto OBJECT IDENTIFIER ::= {
+      iso(1) identified-organization(3) dod(6)
+      internet(1) private(4) enterprise(1) OpenCA(18227)
+      Algorithms(2) PublicKey(1) Experimental(999)
+      kofn-CompositeCrypto(2) }
+~~~
+{: artwork-name="id-kofn-CompositeCrypto OID definition" artwork-align="center" }
+
+## Private Keys {#sec_kofn_priv_keys}
+
+This section provides an encoding for K-of-N Composite private keys intended for PKIX
 protocols and other applications that require an interoperable format for
 transmitting private keys, such as PKCS #8 {{!RFC5958}}, PKCS #12 {{!RFC7292}},
 CMP {{!RFC4210}}, or CRMF {{!RFC4211}}.
 
-The format for the individual component key in a MultiKey key is defined by the
-algorithm OID that identifies the component key. The format of the MultiKey
-described in this section is meant to provide an interoperable format that can
-be adopted and implemented across implementations.
+<!-- The format for the individual component key in a K-of-N Composite key is defined
+by the algorithm OID that identifies the component key. The format of the K-of-N
+Composite private key described in this section is meant to provide an interoperable
+format that can be adopted and implemented across implementations. -->
 
-This document does not cover the use-case where individual components may be
-stored in multiple cryptographic modules.
+Although it is possible to use different types of storage for the individual components
+of a K-of-N Composite key (e.g., certified key modules and non-certified key
+modules), this document does not cover this use-case.
 
-The MultiKey private key data use the same structure as in CompositePrivateKey
+The K-of-N Composite private key data use the same structure as in CompositePrivateKey
 where each component key is a OneAsymmetricKey {{!RFC5958}} object:
 
 ~~~ ASN.1
-MultiKeyPrivateKey ::= CompositePrivateKey
+
+MaxComponents INTEGER ::= 16
+      -- Maximum number of allowed components in a Key
+
+MaxThreshold INTEGER ::= 15
+      -- Maximum value for required algoritmic threshold
+
+CompositeThreshold ::= INTEGER (1..MaxThreshold)
+      -- Allowed value ranges for the K-of-N threshold (K)
+
+kofn-CompositePrivateKey ::= SEQUENCE SIZE (2..MaxComponents)
+  OF OneAsymmetricKey
 ~~~
-{: artwork-name="MultiKeyPrivateKey-asn.1-structures"}
+{: artwork-name="K-of-N Composite Private Key ASN.1 structures"}
 
-A MultiKeyPrivateKey MUST contain at least two component private keys, and they
-MUST be in the same order as in the corresponding MultiKeyPublicKey.
+The parameters field is of type `kofn-CompositeParams` and is defined as follows:
 
-## MultiKey Public Keys {#public_keys}
-
-MultiKey Public Keys are identified by a unique OID and the associated definition
-of the related data structure for a multi-algorithm public key, namely a MultiKey
-key.
-
-The OID that identifies a generic MultiKey key is defined as follows:
-
-~~~ ASN.1
-    id-multikey-key OBJECT IDENTIFIER ::= { 
-      iso(1) identified-organization(3) dod(6) 
-      internet(1) private(4) enterprise(1) OpenCA(18227)
-      Algorithms(2) PublicKey(1) Experimental(999) 
-      MultiKey(2) }
-~~~
-{: artwork-name="MultiKeyObjectIdentifier-asn.1-structures" artwork-align="center" }
-
-The associated definition of MultiKey's public key (pk-MultiKey) and MultiKey's
-public key parameters (MultiKey-params) structures are as follows:
-
-~~~ ASN.1
-MultiKey-params ::= INTEGER (1..MAX)
-
-pk-MultiKey PUBLIC-KEY ::= {
-  id id-multikey-key
-  KeyValue MultiKeyPublicKey
-  Params TYPE MultiKey-params ARE optional
-  PrivateKey MultiKeyPrivateKey
+~~~asn.1
+kofn-CompositeParams ::= SEQUECE {
+  hashAlgorithm           AlgorithmIdentifier,
+    -- Identifier for the hash algorithm used to pre-hash the message
+  threshold               CompositeThreshold OPTIONAL,
+    -- Number of required supported algorithms (must be less than N)
 }
 ~~~
-{: artwork-name="MultiKeyPublicKey-asn.1-structures" artwork-align="center" }
+{: artwork-name="K-of-N Composite Key Parameters ASN.1 structures"}
 
-Where the MultiKey-params is used to specify the number of minimum successful
-validations required for the signature to be considered valid.
+The use of any Composite or hybrid algorithm (e.g., the `pk-kofn-CompositePublicKey` or any
+of the Explicit Composite algorithms defined in {{-composite_sigs}}) is NOT allowed as a
+component of a `kofn-CompositePrivateKey`.
 
-The value of the MultiKey-params must be greater or equal to one (1)
-and shall not exceed the number of component keys present in the
-MultiKey public key.
+The order of the component keys MUST be the same as the order defined for the corresponding
+public key components.
 
-The use of MultiKey algorithm in a component key is not allowed in
-a MultiKey key.
+When a `kofn-CompositePrivateKey` is conveyed inside a OneAsymmetricKey structure
+(version 1 of which is also known as PrivateKeyInfo) [RFC5958], the `privateKeyAlgorithm`
+field SHALL be set to `id-kofn-CompositeCrypto` value, the privateKey field SHALL contain
+the `kofn-CompositePrivateKey` data. Associated public key material MAY be present in the
+the `publicKey` field.
 
-## Composite Signature Extended definition {#extended_sigs}
+### Private Keys and Storage {#sec_kofn_priv_key_storage}
 
-The sa-CompositeSignature structure is extended as follows:
+In some usecases the private keys that comprise a composite key may not be represented in a
+single structure or even be contained in a single cryptographic module; for example if one
+component is within the FIPS boundary of a cryptographic module and the other is not; see
+{sec-fips} for more discussion. The establishment of correspondence between public keys in a
+`kofn-CompositePublicKey` and `kofn-CompositePrivateKey` not represented in a single composite
+structure is beyond the scope of this document.
+
+## K-of-N Composite Public Keys {#sec_kofn_pub_keys}
+
+K-of-N Composite Public Keys are identified by the `id-kofn-CompositeCrypto` OID and the
+associated definition of K-of-N Composite public key (`pk-kofn-CompositePublicKey`) is
+provided as follows:
 
 ~~~ ASN.1
-sa-CompositeSignatureEx SIGNATURE-ALGORITHM ::= {
-       IDENTIFIER id-alg-composite
-       VALUE CompositeSignatureValue
-       PARAMS ANY DEFINED BY ALGORITHM
-       PUBLIC-KEYS { pk-Composite | pk-MultiKey }
-       SMIME-CAPS { IDENTIFIED BY id-alg-composite } }
+
+kofn-CompositePublicKeyParams ::= SEQUENCE {
+  params                  kofn-CompositeParams,
+  componentsParams        SEQUENCE SIZE (1..MaxComponents)
+      OF AlgorithmIdentifier,
+}
+
+pk-kofn-CompositePublicKey PUBLIC-KEY ::= {
+  id id-kofn-CompositeCrypto
+  KeyValue pk-kofn-CompositePublicKey
+  Params TYPE kofn-CompositePublicKeyParams ARE required
+  PrivateKey kofn-CompositePrivateKey
+}
 ~~~
-{: artwork-name="sa-CompositeSignatureEx-asn.1-structures" align="center" }
+{: artwork-name="pk-kofn-CompositePublicKey-asn.1-structures" artwork-align="center" }
 
-The difference with the original `sa-CompositeSignature` definition is the introduction
-of the `pk-MultiKey` in the `PUBLIC-KEYS` definition.
+The use of any Composite algorithms (e.g., the `pk-kofn-CompositePublicKey` or any of the
+Explicit Composite algorithms defined in {{-composite_sigs}}) is NOT allowed as a component
+of a `pk-kofn-CompositePublicKey`.
 
-# MultiKey Signature Processes {#signature_process}
+## Key Generation {#sec_kofn_keygen}
 
-This section specifies the processes for generating and verifying composite
-signatures generated via MultiKey keys.
+The `KeyGen() -> (pk, sk)` is defined as a probabilistic key generation algorithm,
+which generates a public key pk and a secret key sk.
 
-## Generating Composite Signatures {#signing}
+The `KeyGen() -> (pk, sk)` of a composite algorithm performs the `KeyGen()` of the
+respective component signature algorithms and it produces a composite public key `pk`
+as per {{sec_kofn_pub_keys}} and a composite secret key `sk` is per {{sec_kofn_priv_keys}}.
 
-When using MultiKey to generate signatures, the process is the same as
-in the Composite case. Please refer to section 5.1 of {{-composite_sigs}}.
+# K-of-N Composite Signatures {#sec_kofn_sigs}
 
-## Validating Composite Signatures {#validating}
+A K-of-N Composite signature allows two or more underlying signature algorithms to be combined
+into a single cryptographic signature operation and can be used for applications that require
+signatures. In this section, we detail the K-of-N Composite signature definition and two associated
+algorithms for signature generation and validation.
 
-When validating composite signatures generated via MultiKey keys, the
-validation procedures are modified to allow for a well-defined number
-of component signatures validation failures to occur before failing
-the validation of the composite signature as a whole.
+Although K-of-N Composite signatures are defined as a sequence of component signatures, as detailed
+in many parts of this document and in alignment with Explicit Composite processes, the sign and
+verify algorithms are to be considered as a single atomic operations.
+
+# Signature Data Structures {#sec_kofn_sig_structs}
+
+The `kofn-CompositeSignatureParams` and `sa-kofn-CompositeSignature` structures are defined as follows:
+<!-- The `sa-kofn-CompositeSignature` structure is defined as follows: -->
+
+~~~ ASN.1
+kofn-CompositeSignatureParams ::= SEQUENCE {
+  componentsParams    SEQUENCE SIZE 
+      (1..MaxComponents) OF AlgorithmIdentifier,
+  hashAlgorithm   OBJECT IDENTIFIER OPTIONAL,
+}
+
+kofn-CompositeComponentSignatureValue ::= SEQUENCE 
+    SIZE (1..MaxComponents) OF BIT STRING
+ 
+sa-kofn-CompositeSignature SIGNATURE-ALGORITHM ::= {
+      IDENTIFIER id-kofn-CompositeCrypto
+      VALUE kofn-CompositeSignatureValue
+      PARAMS TYPE kofn-CompositeSignatureParams ARE optional
+      PUBLIC-KEYS { pk-kofn-CompositePublicKey }
+      SMIME-CAPS { IDENTIFIED BY id-kofn-CompositeCrypto }
+}
+~~~
+{: artwork-name="sa-kofn-CompositeSignature-asn.1-structures" align="center" }
+
+When a K-of-N Composite Public Key has no defined `hashAlgorithm` parameter, the signer MUST
+include the `hashAlgorithm` parameter in the `kofn-CompositeSignatureParams` structure to
+specify which hash algorithm was used to pre-hash the message before signing as described in
+{{sec_kofn_sigs}}.
+
+When a K-of-N Composite Public Key has the `hashAlgorithm` parameter defined, the signer MUST
+NOT include the `hashAlgorithm` parameter in the `kofn-CompositeSignatureParams` structure.
+
+In case both the K-of-N Composite Public Key and the `kofn-CompositeSignatureParams` structure
+contain the `hashAlgorithm` parameter, the verifier MUST ignore the `hashAlgorithm` parameter
+from the `kofn-CompositeSignatureParams` structure and use the one from the K-of-N Composite
+Public Key.
+
+## Cryptographic Primitives {#sec_kofn_processes}
+
+In this section we define K-of-N Composite Signatures as a cryptographic primitive that consists
+of three algorithms. The first one is the `kofn-KeyGen()` and is defined in {{sec_kofn_keys}}.
+
+The remaining two algorithms are the `Sign()` and `Verify()` algorithms, which are defined in
+{{sec_kofn_sign}} and {{sec_kofn_verify}} respectively and can be summarized as follows:
+
+* kofn-Sign(sk, Message) -> (signature): A signing algorithm which takes
+  as input a secret key sk and a Message, and outputs a signature.
+
+* kofn-Verify(pk, Message, signature) -> true or false: A verification algorithm
+  which takes as input a public key, a Message, an optional hashing algorithm,
+  and a signature and outputs true if the signature and public key can be used
+  to verify the message.  Thus it proves the Message was signed with the secret
+  key associated with the public key and verifies the integrity of the Message.
+  If the signature and public key cannot verify the Message, it returns false.
+
+## The kofn-Sign() primitive {#sec_kofn_sign}
+
+When using K-of-N Composite Private Keys to generate signatures, the process is
+the same as in the Explicit Composite case (see section 5.1 of {{-composite_sigs}}).
+
+Specifically, the generation of a K-of-N Composite signature involves pre-hashing
+the message to be signed with key-binding data to provide non-separability properties
+for the signature, and then applying each component algorithm's signature process to
+the modified input message according to its specification. Each component signature value
+is then placed into the CompositeSignatureValue structure defined in {{sec_kofn_sig_structs}}.
+
+The following process is used to generate composite signature values.
+
+~~~
+kofn-Sign (sk, Message) -> (signature)
+Input:
+    K1..KN             Signing private keys for each component. See note below on 
+                        composite inputs.  
+
+    A1..AN             Component signature algorithms. See note below on 
+                        composite inputs.
+
+    Message            The Message to be signed, an octet string
+    
+    HASH               The Message Digest Algorithm used for pre-hashing.  See section
+                        on pre-hashing below.
+    
+    OID                The Composite Signature String Algorithm Name converted
+                        from ASCII to bytes.  See section on OID concatenation
+                        below.                 
+
+Output:
+    signature          The composite signature, a CompositeSignatureValue
+
+Signature Generation Process:
+
+  1. Compute a Hash of the Message
+  
+        M' = HASH(Message)
+        
+  2. Generate the n component signatures independently,
+      according to their algorithm specifications.
+
+        S1 := Sign( K1, A1, DER(OID) || DER(kofn-CompositeKeyParams) || M' )
+        ...
+        SN := Sign( KN, AN, OID || M' )
+
+  3. Encode each component signature S1..SN into a sequence of BIT STRING
+      according to its algorithm specification.
+
+        signatureComponent ::= BIT STRING
+
+        signature ::= SEQUENCE (1..N) OF signatureComponent
+
+  4. Output signature
+~~~
+{: #kofn-composite-sign title="K-of-N Composite Sign(sk, Message)"}
+
+Note on composite inputs: the method of providing the list of component keys and algorithms
+is flexible and beyond the scope of this pseudo-code.  When passed to the `Composite Sign(sk, Message)`
+API the `sk` is a `kofn-CompositePrivateKey`. It is possible to construct a `kofn-CompositePrivateKey`
+from component keys stored in separate software or hardware keystores. Variations in the process
+to accommodate particular private key storage mechanisms are considered to be conformant to this
+document so long as it produces the same output as the process sketched above.
+
+Since recursive composite public keys are disallowed, no component signature may itself be a composite
+of any kind (K-of-N or Explicit); this means that the signature generation process MUST fail if one
+of the private keys K1..KN is a composite.
+
+A composite signature MUST produce, and include in the output, a signature value for every component key
+in the corresponding `kofn-CompositePublicKey`, and they MUST be in the same order; ie in the output, S1
+MUST correspond to K1, S2 to K2, ..., and SN to KN.
+
+## The kofn-Verify() primitive {#sec_kofn_verify}
+
+When validating composite signatures generated via `id-kofn-CompositeCrypto`
+algorithm, the validation procedures, when compared to the Explicit Composite,
+are modified to allow for a well-defined number of component signatures
+validation failures to occur before failing the validation of the composite
+signature as a whole.
+
 The possibility to be able to still consider a composite signature valid
-in the presence of unsupported protocols is a useful feature for
-guaranteeing the interoperability of newer devices with older ones that might not be
-able to correctly process all the algorithms (but they can still
-validate a subset of them).
+in the presence of unsupported algorithms is a useful feature for
+guaranteeing the interoperability of newer devices with older ones that
+might not be able to correctly process all the algorithms (but they can
+still validate a subset of them).
 
 In fact, when validating signatures generated via MultiKey keys, the
 total number of successful component signature validations shall be equal
 or greater than the public key parameter `K` (when present). After that,
-additional component signatures' validations may be skipped (or fail)
-without impacting the validity of the whole composite signature.
+additional component signatures' validations may be skipped, if and only
+if the algorithm is unknown to the crypto layer, without impacting the
+validity of the whole composite signature. If any of the signatures of
+supported algorithms should fail the validation, the K-of-N Composite
+signature validation MUST fail, independently of the value of `K`.
 
 When the public key parameter `K` is absent or its value is set to the
 number of components in the signing key (i.e., `K = n`), the validation
-process for MultiKey and Composite are the same.
+process for MultiKey and Composite are the same as they both require the
+successful validation of all the signatures.
 
 When the public key parameter `K` is set to one (`1`), the validation
-process for MultiKey provides support for fully alternative signatures
-where a single successful component signature's validation validates
-the whole composite signature.
+process for K-of-N Composite signatures provides support for fully
+alternative signatures where a single successful component signature's
+validation validates the whole composite signature.
 
 When compared to the composite signatures' validation process, we modify
-the for..loop cycle where the invalid signature output is not emitted 
-after the first validation failure, but only if the number of remaining
-successful validations is larger than the number of remaining
-validations.
+the for..loop cycle where the invalid signature output is not emitted
+if the algorithm is unknown, but only if the number of unsupported
+algorithms is greated than the value `N - K`.
 
 The second optimization allowed by MultiKey keys is to be able to consider
 a composite signature successful right after at least `K` successful
 component signatures' validations, without the need for even attempting
 at performing the remaining ones.
 
-The Input and Output definitions are the same as defined in composite:
+The Input and Output definitions are the same as defined in the Explicit
+Composite case:
 
 ~~~
 Input:
      P1, P2, .., Pn    Public verification keys. 
+
+     HASH              The Message Digest Algorithm used for pre-hashing.  See section
+                       on pre-hashing below.
 
      M                 Message
      
@@ -336,10 +603,10 @@ Output:
                         signature is valid, "Invalid signature" 
                         (false) otherwise.
 ~~~
-{: artwork-align="center" artwork-name="MultiKeyValidation.process-setup" }
+{: #kofn-verify-process artwork-align="center" artwork-name="K-of-N Validation Process"}
 
 The following process is used to perform composite signatures verification
-with a MultiKey key:
+with a K-of-N Composite algorithm:
 
 ~~~
 1. Check keys, signatures, and algorithms for consistency.
@@ -347,88 +614,88 @@ with a MultiKey key:
    If Error during desequencing, or the three sequences
    have different numbers of elements, or any of the public
    keys P1, P2, .., Pn or algorithm identifiers A1, A2, ..,
-   An are multikey with the OID id-alg-composite or an
-   explicit composite OID then output "Invalid signature"
-   and stop.
+   An are any type of composite (i.e., k-of-n or explicit)
+   then output "Invalid signature" and stop.
 
-2. Check each component signature individually, according to
-   its algorithm specification. Parameter K holds the number of successful
-   validations yet required and is reduced as soon as a component signature is verified.
-   If K reaches 0, the entire signature validation
-   succeeds. If all component signatures are processed and K is not 0, The Validation as whole fails.
+2. Construct the modified message M' to be used for the validation
+   process with each component signature.
 
-   IF MultiKey-params
-     K := MultiKey-params
-   ELSE
-     K := n
+       M' = HASH(Message)
 
-   FOR i := 1 TO n:
-     IF verify( Pi, M, Si, Ai ):
-       K--
-     IF (K == 0):
-       Output "Valid signature"
-     IF (n - i < K):
-       Output "Invalid Signature"
+   Set the initial counter `X` to zero to indicate the number
+   of unsupported algorithms encountered during the validation
+   process.
+
+3. Process each signature component in order, from S1 to Sn 
+   as follows:
+    
+   3.a Check the support for each component of the signature against
+       the number of required supported algorithms (`threshold`).
+
+       If the public key parameter `threshold` is NOT set and the
+       component signature algorithm is not supported, the validation
+       fails, output "Invalid signature" and stop.
+        
+       If the public key parameter `threshold` is set and the component
+       signature is not supported, the counter `X` is incremented. If `X`
+       is greater than `N - K`, the validation fails, output "Invalid
+       signature" and stop.
+        
+       If a component signature is not supported and the corresponding
+       `isRequired` field of the associated `kofn-CompositeComponentKeyParams`
+       is present and set to `TRUE`, the validation fails, output
+       "Invalid signature" and stop.
+
+   3.b Check each component signature individually, according to
+       its algorithm specification.
+
+           Result := Verify(Kx, Ax, DER(OID) || DER(kofn-CompositeKeyParams) || M')
+
+       If any of the component signatures S1, S2, .., Sn is not
+       correctly validated according to the component's algorithm,
+       the validation fails, output "Invalid signature" and stop.
+
+4. Output "Valid signature"
 ~~~
-{: artwork-align="center" artwork-name="alg-sig-verify" }
+{: #kofn-comp-verify artwork-align="center" artwork-name="K-of-N Composite Signatures Verify Process" }
 
-<!-- End of Introduction section -->
-
-# Algorithm Identifiers {#identifiers}
-
-In this work, we define a set of OIDs that allow for assigning explicit
-algorithm combination to specific MultiKey keys configuration.
-
-Please refer to Appendix {{identifiers}} for more details about
-explicit MultiKey identifiers.
-
-## Signature Algorithm Identifiers {#signature_identifiers}
-
-This document does not define a separate sets of algorithms and leverages the
-extends the definitions of composite signatures defined in {{-composite_sigs}}
-with the addition of the pk-multikey-key in the PUBLIC-KEYS set.
-
-## Public Key Algorithm Identifiers {#public_key_identifiers}
-
-Section {{public_keys}} provides the definition for the generic MultiKey
-key identifier. The generic construct for a MultiKey key allows for both
-standard and non-standard (i.e., private, test, etc.) public key algorithms
-to be used to produce composite signatures.
-
-Similarly to the composite case, the use of explicit combinations of
-algorithms can simplify the management of identities by allowing for
-inspecting a single OID (the outmost one) instead of requiring the
-inspection of the individual components of the MultiKey key.
-
-# Deprecating Algorithms and Impact over signature validations
+# Algorithm Management {#sec-deprecation}
 
 Traditionally, a public key, certificate, or signature contains a single
-cryptographic algorithm and to revoke a certificate due to algorithm
+cryptographic algorithm. To revoke such a certificate due to algorithm
 depecation we still need to use serial-number-based revocations.
 
-However, in a multi-algorithms environment (e.g., supported via Composite,
-MultiKey, or other Hybrid approaches), it might be possible to deprecate
+However, in a Composite environment (e.g., supported via Explicit Composite,
+K-of-N Composite, or other Hybrid approaches), it might be possible to deprecate
 an entire algorithm and still be able to securely continue performing
 authentications and validations instead of revoking (or simply distrust)
 the entire infrastructure (and without adding every single certificate
 that relies on the deprecated algorithm on the revocation list).
 
-By integrating the concept of deprecated algorithms, in the MultiKey case 
+By integrating the concept of deprecated algorithms, in the K-of-N case
 it is possible to dynamically switch among which algorithms are going to
 be used for signature validations by informing the validating entity about
 the OIDs of the individual algorithms that are considered "failures".
 
-In fact, the validating entity can automatically "fail" the validation of
+Additionally, by integrating the concept of required algorithms, in the
+K-of-N case it is possible to make sure that specific algorithms are
+always required to be supported by the validating entity. This could be
+the case, for example, when the trust in one of the algorithm might be
+higher (e.g., certified and/or longer crypto-analysis history).
+
+<!-- In fact, the validating entity can automatically "fail" the validation of
 component signatures that match any value present in the list of revoked
 algorithms, exactly in the same fashion as when the algorithm is not
-supported in the first place.
+supported in the first place. -->
 
-## Distributing the list of deprecated algorithms
+## Validation Policy and Revocation Information {#validation_policy}
 
-As we just mentioned, in MultiKey environments, there are situations
+As we just mentioned, in multi-algorithm environments, there are situations
 where the validation of a component signature that carries a deprecated
 algorithm identifier might still be allowed, e.g. when at least another
-`K` validate correctly.
+`K` algorithms validate correctly. In a K-of-N environment, this means that
+the device does not need to be re-provisioned (or replaced) and can continue
+to operate by relying on the non-deprecated algorithm(s).
 
 On top of that, there are also typical use-cases where the deprecation
 of an algorithm is paramount to make sure that authentications do not
@@ -436,17 +703,21 @@ rely only on deprecated algorithms. This is the case, for example, when
 older devices that can only successfully validate one algorithm from a
 composite signature (e.g., it can validate RSA signatures but no other)
 are still part of the network. When the only algorithm that they can use
-is deprecated, validation of composite signature MUST fail. 
-
-Differently from the pure composite case, if the device can still
-successfully validate `K` component signatures, the device does not need
-to be re-provisioned (or replaced) and can continue to operate by
-relying on the non-deprecated algorithm.
+is deprecated, validation of composite signature MUST fail.
 
 The list of deprecated algorithms that are to be considered automatic
-validation "failures" can be directly configured as a parameter in the
+validation "unknowns" can be directly configured as a parameter in the
 validating entity's process, or by accessing a trusted source of
-information.
+information such as a trusted Certificate Revocation List (CRL) or Online
+Certificate Status Protocol (OCSP) response.
+
+Similarly, the list of required algorithms that cannot be skipped,
+even if not supported by the device can be directly configured as a
+parameter in the validating entity's process, or by accessing a trusted
+source of information such as a trusted Certificate Revocation List (CRL)
+or Online Certificate Status Protocol (OCSP) response.
+
+## The `DeprecatedKeyTypes` extension {#deprecated_key_types}
 
 In an ecosystem such as the Internet PKI or IoT PKIs, since algorithm
 deprecation can be seen as another form of (mass) revocation, a convenient
@@ -454,88 +725,105 @@ mechanism to distribute the list of deprecated algorithms by adding a
 specific extension to Certificate Revocation Lists {{!RFC5280}} or Online
 Certificate Status Protocol {{!RFC6960}} responses.
 
-We define a new `deprecated-algorithms` extension together with the
-associated `id-ext-deprecated-algorithms` identifier. The data structure
-of the extension is defined as a `SEQUENCE` of `DeprecatedAlgorithm`.
-Each `DeprecatedAlgorithm` is defined as an `OBJECT IDENTIFIER`.
+We define a new `DeprecatedKeyTypes` extension together with the
+associated `id-ce-deprecatedKeyTypes` identifier. The data structure
+of the extension is defined as a `SEQUENCE` of `OBJECT IDENTIFIER`. The
+corresponding ASN.1 structures are defined as follows:
 
-We define the following identifier:
-
-~~~asn.1
-id-ce-deprecatedAlgsList OBJECT IDENTIFIER ::= { 
+~~~ ASN.1
+id-ce-deprecatedKeyTypes OBJECT IDENTIFIER ::= { 
       iso(1) identified-organization(3) dod(6) 
       internet(1) private(4) enterprise(1) OpenCA(18227)
       Extensions(3) deprecated-algs (2) }
+
+DeprecatedKeyTypes ::= SEQUENCE SIZE (1..MaxThreshold) 
+      OF OBJECT IDENTIFIER
 ~~~
 
+When this extension is present in a CRL or OCSP response, the validating
+party MUST consider the algorithms listed in the extension as "unknown",
+even in the case where the algorithm is supported by the device. At a
+practical level, this means that the validation of a component signature
+that carries a deprecated algorithm identifier MUST fail if the threshold
+(or K-of-N) validations is not met because of the deprecation of algorithms.
+
+For example, let's imagine a K-of-N Composite key that combines AlgorithmA
+and AlgorithmB together. Let's also imagine that a device can only validate
+AlgorithmA and does not have support for AlgorithmB. If the K-of-N threshold
+is set to `1`, then the device can still validate the composite signature
+since it can still rely on AlgorithmA. However, if AlgorithmA is deprecated
+via the `DeprecatedKeyTypes` extension, then the validation MUST fail
+because the device can no longer rely on AlgorithmA.
+
+## The `RequiredKeyTypes` extension {#required_key_types}
+
+When backward or forward compatibility is required, it might be useful to
+provide the possibility to pin specific algorithms to be required to be
+supported during signature and validations processes.
+
+For example, when a K-of-N is used with `N = 3` and `K =2`, there migth be
+requirements to make sure that one of the two required algorithms to be
+validated is a specific one (e.g., AlgorithmA).
+
+To handle this situation, we define a new `RequiredKeyTypes` extension,
+together with the associated `id-ce-requiredKeyTypes` identifier, that can
+be added to Certificate Revocation Lists {{!RFC5280}}, Online Certificate Status
+Protocol {{!RFC6960}} responses.
+
+We define a new `RequiredKeyTypes` extension together with the
+associated `id-ce-requiredKeyTypes` identifier. The data structure
+of the extension is defined as a `SEQUENCE` of `OBJECT IDENTIFIER`. The
+corresponding ASN.1 structures are defined as follows:
+
+~~~ ASN.1
+id-ce-requiredKeyTypes OBJECT IDENTIFIER ::= { 
+      iso(1) identified-organization(3) dod(6) 
+      internet(1) private(4) enterprise(1) OpenCA(18227)
+      Extensions(3) required-algs (3) }
+
+RequiredKeyTypes ::= SEQUENCE SIZE (1..MaxThreshold) 
+      OF OBJECT IDENTIFIER
+~~~
 
 # IANA Considerations {#sec-iana}
 
-This document registers the following in the SMI "Security for PKIX Algorithms (1.3.6.1.5.5.7.6)" registry:
-
-~~~ ASN.1
-id-composite-key OBJECT IDENTIFIER ::= {
-    iso(1) identified-organization(3) dod(6) internet(1) security(5)
-    mechanisms(5) pkix(7) algorithms(6) id-multikey-key(??) }
-~~~
-
-This document registers the following in the SMI " " registry:
-
-~~~ ASN.1
-id-ce-deprecatedAlgsList OBJECT IDENTIFIER ::= { id-ce deprecatedAlgsList(??) }
-~~~
+No IANA actions are required by this document.
 
 # Security Considerations {#security-considerations}
 
+TBD.
 
-<!-- End of Security Considerations section -->
+# Contributors and Acknowledgements
 
-<!-- Start of Appendices -->
+This document incorporates contributions and comments from a large group of experts. The Editors would especially like to acknowledge the expertise and tireless dedication of the following people, who attended many long meetings and generated millions of bytes of electronic mail and VOIP traffic over the past year in pursuit of this document:
+
+Serge Mister (Entrust),
+Scott Fluhrer (Cisco Systems),
+Klaus-Dieter Wirth (D-Trust), and
+François Rousseau.
+
+We are grateful to all, including any contributors who may have
+been inadvertently omitted from this list.
+
+This document borrows text from similar documents, including those referenced below. Thanks go to the authors of those
+   documents.  "Copying always makes things easier and less error prone" - {{!RFC8411}}.
+
 --- back
-
-# Explicit Algorithm Identifiers {#explicit-algorithms}
-
-This variant provides a rigid way of specifying supported
-combinations of algorithms.
-
-Although this variant limits the possibility for combining
-non-standard algorithms (or algorithms not considered by the
-authors of this document), the use of identifiers that identify
-pairs of standard algorithms might be easier in certain
-situations such as referencing and/or enforcing specific
-combinations of algorithms without the need for developing
-additional validation procedures external to the signature
-validation one.
-
-Explicit algorithms must define a new signature algorithm which
-consists of:
-
-*  A new algorithm identifier OID for the explicit algorithm.
-*  The algorithm identifier OID and PUBLIC-KEY type of each component
-   algorithm.
-*  Signature parameters either declared ABSENT, or defined with a
-   type and encoding.
-
-The definition of the explicit algorithm identifiers follows
-the same definitions provided in Section 4.2 of {{-composite_keys}}
-with the exception of the parameters that are not ABSENT but
-OPTIONAL and their TYPE is MultiKey-params as defined in {{public_keys}}.
-
 
 # ASN.1 Module
 
 ~~~ ASN.1
 
-<CODE STARTS>
-
-MultiKey-2022
+kofn-Composite-Crypto-2023
+  { joint-iso-itu-t(2) country(16) us(840) organization(1) OpenCA(18277) 
+    Algorithms(2) PublicKey(1) kofn-CompositeCrypto(2) }
 
 DEFINITIONS IMPLICIT TAGS ::= BEGIN
 
 EXPORTS ALL;
 
 IMPORTS
-  PUBLIC-KEY, SIGNATURE-ALGORITHM, ParamOptions, AlgorithmIdentifier{}
+  PUBLIC-KEY, SIGNATURE-ALGORITHM, AlgorithmIdentifier{}
     FROM AlgorithmInformation-2009  -- RFC 5912 [X509ASN1]
       { iso(1) identified-organization(3) dod(6) internet(1)
         security(5) mechanisms(5) pkix(7) id-mod(0)
@@ -551,24 +839,113 @@ IMPORTS
     FROM AsymmetricKeyPackageModuleV1
       { iso(1) member-body(2) us(840) rsadsi(113549) pkcs(1)
         pkcs-9(9) smime(16) modules(0)
-        id-mod-asymmetricKeyPkgV1(50) } ;
-
-  COMPOSITE-KEY-ALGORITHM, pk-Composite, CompositePublicKey, 
-    CompositePrivateKey, pk-explicitComposite, id-composite-key
-    FROM Composite-Keys-2022 -- {{I-D.draft-ounsworth-pq-sigs}}
-      { ... }
+        id-mod-asymmetricKeyPkgV1(50) } 
+       
+;       
+        
 --
 -- Object Identifiers
 --
- 
+
+-- Defined in ITU-T X.690
+der OBJECT IDENTIFIER ::=
+  {joint-iso-itu-t asn1(1) ber-derived(2) distinguished-encoding(1)}
+
+id-kofn-CompositeCrypto OBJECT IDENTIFIER ::= {
+  iso(1) identified-organization(3) dod(6)
+  internet(1) private(4) enterprise(1) OpenCA(18227)
+  Algorithms(2) PublicKey(1) Experimental(999)
+  kofn-CompositeCrypto(2)
+}
+
+id-ce-deprecatedKeyTypes OBJECT IDENTIFIER ::= { 
+  iso(1) identified-organization(3) dod(6) 
+  internet(1) private(4) enterprise(1) OpenCA(18227)
+  Extensions(3) deprecated-algs (2) 
+}
+
+id-ce-requiredKeyTypes OBJECT IDENTIFIER ::= { 
+  iso(1) identified-organization(3) dod(6) 
+  internet(1) private(4) enterprise(1) OpenCA(18227)
+  Extensions(3) required-algs (3)
+}
 
 --
--- Public Key
+-- Constants
 --
+
+MaxComponents INTEGER ::= 16
+      -- Maximum number of allowed components in a Key
+
+MaxThreshold INTEGER ::= 15
+      -- Maximum value for required algoritmic threshold
+
+CompositeThreshold ::= INTEGER (1..MaxThreshold)
+      -- Allowed value ranges for the K-of-N threshold (K)
+
+--
+-- Private Keys
+--
+
+kofn-CompositePrivateKey ::= SEQUENCE SIZE (2..MaxComponents)
+  OF OneAsymmetricKey
+
+kofn-CompositeParams ::= SEQUECE {
+  hashAlgorithm           AlgorithmIdentifier,
+    -- Identifier for the hash algorithm used to pre-hash the message
+  threshold               CompositeThreshold OPTIONAL,
+    -- Number of required supported algorithms (must be less than N)
+}
+
+--
+-- Public Keys
+--
+
+kofn-CompositePublicKeyParams ::= SEQUENCE {
+  params                  kofn-CompositeParams,
+  componentsParams        SEQUENCE SIZE (1..MaxComponents)
+      OF AlgorithmIdentifier,
+}
+
+pk-kofn-CompositePublicKey PUBLIC-KEY ::= {
+   id id-kofn-CompositeCrypto
+   KeyValue pk-kofn-CompositePublicKey
+   Params TYPE kofn-CompositePublicKeyParams ARE required
+   PrivateKey kofn-CompositePrivateKey
+}
+
+--
+-- Signature Algorithm
+--
+
+kofn-CompositeSignatureParams ::= SEQUENCE {
+  componentsParams    SEQUENCE SIZE 
+      (1..MaxComponents) OF AlgorithmIdentifier,
+  hashAlgorithm   OBJECT IDENTIFIER OPTIONAL,
+}
+
+kofn-CompositeComponentSignatureValue ::= SEQUENCE 
+    SIZE (1..MaxComponents) OF BIT STRING
+ 
+sa-kofn-CompositeSignature SIGNATURE-ALGORITHM ::= {
+      IDENTIFIER id-kofn-CompositeCrypto
+      VALUE kofn-CompositeSignatureValue
+      PARAMS TYPE kofn-CompositeSignatureParams ARE optional
+      PUBLIC-KEYS { pk-kofn-CompositePublicKey }
+      SMIME-CAPS { IDENTIFIED BY id-kofn-CompositeCrypto }
+}
+
+--
+-- Extensions
+--
+
+DeprecatedKeyTypes ::= SEQUENCE SIZE (1..MaxThreshold) 
+      OF OBJECT IDENTIFIER
+
+RequiredKeyTypes ::= SEQUENCE SIZE (1..MaxThreshold) 
+      OF OBJECT IDENTIFIER
 
 END
-
-<CODE ENDS>
 
 ~~~
 
@@ -577,33 +954,13 @@ END
 
 The following IPR Disclosure relates to this draft:
 
-https://datatracker.ietf.org/ipr/3588/
-
-
-
-# Contributors and Acknowledgements
-This document incorporates contributions and comments from a large group of experts. The Editors would especially like to acknowledge the expertise and tireless dedication of the following people, who attended many long meetings and generated millions of bytes of electronic mail and VOIP traffic over the past year in pursuit of this document:
-
-John Gray (Entrust),
-Serge Mister (Entrust),
-Scott Fluhrer (Cisco Systems),
-Panos Kampanakis (Cisco Systems),
-Daniel Van Geest (ISARA),
-Tim Hollebeek (Digicert),
-Klaus-Dieter Wirth (D-Trust), and
-François Rousseau.
-
-We are grateful to all, including any contributors who may have
-been inadvertently omitted from this list.
-
-This document borrows text from similar documents, including those referenced below. Thanks go to the authors of those
-   documents.  "Copying always makes things easier and less error prone" - {{!RFC8411}}.
+* <https://datatracker.ietf.org/ipr/3588/>
 
 ## Making contributions
 
 Additional contributions to this draft are welcome. Please see the working copy of this draft at, as well as open issues at:
 
-https://github.com/EntrustCorporation/draft-ounsworth-pq-composite-keys
+<https://github.com/EntrustCorporation/draft-klaussner-pala-composite-kofn>
 
 
 <!-- End of Contributors section -->
