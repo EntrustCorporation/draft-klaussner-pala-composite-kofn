@@ -88,8 +88,7 @@ Table of Contents
            Composite . . . . . . . . . . . . . . . . . . . . . . . .   5
    3.  K-of-N Composite Keys . . . . . . . . . . . . . . . . . . . .   6
      3.1.  Private Keys  . . . . . . . . . . . . . . . . . . . . . .   6
-       3.1.1.  Private Keys and Storage  . . . . . . . . . . . . . .   7
-     3.2.  K-of-N Composite Public Keys  . . . . . . . . . . . . . .   8
+     3.2.  Public Keys . . . . . . . . . . . . . . . . . . . . . . .   8
      3.3.  Key Generation  . . . . . . . . . . . . . . . . . . . . .   8
    4.  K-of-N Composite Signatures . . . . . . . . . . . . . . . . .   8
    5.  Signature Data Structures . . . . . . . . . . . . . . . . . .   9
@@ -106,6 +105,7 @@ Table of Contents
    10. References  . . . . . . . . . . . . . . . . . . . . . . . . .  18
      10.1.  Normative References . . . . . . . . . . . . . . . . . .  18
      10.2.  Informative References . . . . . . . . . . . . . . . . .  19
+   Appendix A.  ASN.1 Module . . . . . . . . . . . . . . . . . . . .  20
 
 
 
@@ -114,7 +114,6 @@ Pala, et al.               Expires 6 June 2024                  [Page 2]
 Internet-Draft         k-of-n Composite Signatures         December 2023
 
 
-   Appendix A.  ASN.1 Module . . . . . . . . . . . . . . . . . . . .  20
    Appendix B.  Intellectual Property Considerations . . . . . . . .  23
      B.1.  Making contributions  . . . . . . . . . . . . . . . . . .  23
    Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  23
@@ -162,6 +161,7 @@ Internet-Draft         k-of-n Composite Signatures         December 2023
 
    PUBLIC / PRIVATE KEY: The public and private portion of an asymmetric
    cryptographic key, making no assumptions about which algorithm.
+
 
 
 
@@ -375,8 +375,6 @@ Internet-Draft         k-of-n Composite Signatures         December 2023
    CompositePrivateKey data.  Associated public key material MAY be
    present in the the publicKey field.
 
-3.1.1.  Private Keys and Storage
-
    In some usecases the private keys that comprise a composite key may
    not be represented in a single structure or even be contained in a
    single cryptographic module; for example if one component is within
@@ -389,12 +387,14 @@ Internet-Draft         k-of-n Composite Signatures         December 2023
 
 
 
+
+
 Pala, et al.               Expires 6 June 2024                  [Page 7]
 
 Internet-Draft         k-of-n Composite Signatures         December 2023
 
 
-3.2.  K-of-N Composite Public Keys
+3.2.  Public Keys
 
    K-of-N Composite Public Keys are identified by the id-kofn-
    CompositeCrypto OID and the associated definition of K-of-N Composite

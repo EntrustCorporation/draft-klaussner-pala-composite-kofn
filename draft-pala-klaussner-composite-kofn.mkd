@@ -353,8 +353,6 @@ field SHALL be set to `id-kofn-CompositeCrypto` value, the privateKey field SHAL
 the `kofn-CompositePrivateKey` data. Associated public key material MAY be present in the
 the `publicKey` field.
 
-### Private Keys and Storage {#sec_kofn_priv_key_storage}
-
 In some usecases the private keys that comprise a composite key may not be represented in a
 single structure or even be contained in a single cryptographic module; for example if one
 component is within the FIPS boundary of a cryptographic module and the other is not; see
@@ -362,7 +360,7 @@ component is within the FIPS boundary of a cryptographic module and the other is
 `kofn-CompositePublicKey` and `kofn-CompositePrivateKey` not represented in a single composite
 structure is beyond the scope of this document.
 
-## K-of-N Composite Public Keys {#sec_kofn_pub_keys}
+## Public Keys {#sec_kofn_pub_keys}
 
 K-of-N Composite Public Keys are identified by the `id-kofn-CompositeCrypto` OID and the
 associated definition of K-of-N Composite public key (`pk-kofn-CompositePublicKey`) is
